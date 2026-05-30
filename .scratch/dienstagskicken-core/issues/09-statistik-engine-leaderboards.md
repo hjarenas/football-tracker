@@ -1,6 +1,6 @@
 # 09 — Statistik-Engine + Saison-Leaderboards
 
-Status: ready-for-agent
+Status: completed
 
 ## Parent
 
@@ -28,15 +28,15 @@ Covers user stories: 1, 2, 3, 4, 5, 6, 12, 13, 14.
 
 ## Acceptance criteria
 
-- [ ] Statistik-Engine correctly computes all five leaderboard categories
-- [ ] Eigentore are excluded from scorer's Tore count
-- [ ] Cancelled matches are excluded from all categories
-- [ ] Tied Spieler share the same rank
-- [ ] points_override is respected in Punktetabelle computation
-- [ ] Vitest unit tests pass for all Statistik-Engine logic with fixture data
-- [ ] Public leaderboard page shows current season by default
-- [ ] Season selector switches all five categories to the selected Saison
-- [ ] Page is mobile-first and in German
+- [x] Statistik-Engine correctly computes all five leaderboard categories
+- [x] Eigentore are excluded from scorer's Tore count
+- [x] Cancelled matches are excluded from all categories
+- [x] Tied Spieler share the same rank
+- [x] points_override is respected in Punktetabelle computation
+- [x] Vitest unit tests pass for all Statistik-Engine logic with fixture data
+- [x] Public leaderboard page shows current season by default
+- [x] Season selector switches all five categories to the selected Saison
+- [x] Page is mobile-first and in German
 
 ## Blocked by
 
