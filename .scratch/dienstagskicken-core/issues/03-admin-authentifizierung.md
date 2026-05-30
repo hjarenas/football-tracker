@@ -1,6 +1,6 @@
 # 03 — Admin-Authentifizierung
 
-Status: ready-for-agent
+Status: completed
 
 ## Parent
 
@@ -21,13 +21,13 @@ Covers user stories: 15, 27.
 
 ## Acceptance criteria
 
-- [ ] Visiting `/admin` without a session redirects to `/anmelden`
-- [ ] Logging in with valid credentials grants access to `/admin`
-- [ ] Logging in with invalid credentials shows a German error message
-- [ ] Non-admin credentials (not in whitelist) are rejected
-- [ ] Logout clears the session and redirects to `/`
-- [ ] Public routes (`/`) are accessible without login
-- [ ] Unit tests pass for middleware auth logic
+- [x] Visiting `/admin` without a session redirects to `/anmelden`
+- [x] Logging in with valid credentials grants access to `/admin`
+- [x] Logging in with invalid credentials shows a German error message
+- [x] Non-admin credentials (not in whitelist) are rejected
+- [x] Logout clears the session and redirects to `/`
+- [x] Public routes (`/`) are accessible without login
+- [x] Unit tests pass for middleware auth logic
 
 ## Blocked by
 
