@@ -1,6 +1,6 @@
 # 10 — Spielübersicht
 
-Status: ready-for-agent
+Status: completed
 
 ## Parent
 
@@ -23,12 +23,12 @@ Covers user stories: 8, 9, 10, 11, 12, 13.
 
 ## Acceptance criteria
 
-- [ ] Public match list at `/spiele` shows all matches for the current season
-- [ ] Derived score is displayed correctly for each completed match
-- [ ] Scorers and assists are listed per match
-- [ ] Cancelled matches appear with `Abgesagt` label and no score
-- [ ] Season selector allows viewing past seasons
-- [ ] Page is mobile-first and in German
+- [x] Public match list at `/spiele` shows all matches for the current season
+- [x] Derived score is displayed correctly for each completed match
+- [x] Scorers and assists are listed per match
+- [x] Cancelled matches appear with `Abgesagt` label and no score
+- [x] Season selector allows viewing past seasons
+- [x] Page is mobile-first and in German
 
 ## Blocked by
 
