@@ -1,6 +1,6 @@
 # 14 — Hetzner-Deployment
 
-Status: ready-for-agent
+Status: completed
 
 ## Parent
 
@@ -23,11 +23,11 @@ Set up production deployment to a Hetzner VPS with automatic SSL. This is a HITL
 
 ## Acceptance criteria
 
-- [ ] `docker-compose.prod.yml` runs the app and PostgreSQL in production mode
-- [ ] Caddy serves the app over HTTPS with a valid Let's Encrypt certificate
-- [ ] Pushing to `main` triggers the deploy workflow and updates the running app
-- [ ] Database data persists across deployments (volume mount)
-- [ ] All production env vars are documented in `.env.production.example`
+- [x] `docker-compose.prod.yml` runs the app and PostgreSQL in production mode
+- [x] Caddy serves the app over HTTPS with a valid Let's Encrypt certificate
+- [x] Pushing to `main` triggers the deploy workflow and updates the running app
+- [x] Database data persists across deployments (volume mount)
+- [x] All production env vars are documented in `.env.production.example`
 
 ## Blocked by
 
