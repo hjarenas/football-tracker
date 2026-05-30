@@ -1,6 +1,6 @@
 # 11 — Ewige Tabelle
 
-Status: ready-for-agent
+Status: completed
 
 ## Parent
 
@@ -16,11 +16,11 @@ Covers user story: 7.
 
 ## Acceptance criteria
 
-- [ ] Public Ewige Tabelle page at `/ewige-tabelle` shows all-time totals for all five categories
-- [ ] Stats aggregate correctly across multiple Saisons
-- [ ] Cancelled matches are excluded
-- [ ] Tied Spieler share the same rank
-- [ ] Page is mobile-first and in German
+- [x] Public Ewige Tabelle page at `/ewige-tabelle` shows all-time totals for all five categories
+- [x] Stats aggregate correctly across multiple Saisons
+- [x] Cancelled matches are excluded
+- [x] Tied Spieler share the same rank
+- [x] Page is mobile-first and in German
 
 ## Blocked by
 
