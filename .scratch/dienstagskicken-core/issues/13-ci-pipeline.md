@@ -1,6 +1,6 @@
 # 13 — CI-Pipeline
 
-Status: ready-for-agent
+Status: completed
 
 ## Parent
 
@@ -20,12 +20,12 @@ The pipeline spins up a PostgreSQL service container for the E2E step so no exte
 
 ## Acceptance criteria
 
-- [ ] Pipeline runs on every push and pull request
-- [ ] `tsc --noEmit` failure blocks the pipeline
-- [ ] `vitest run` failure blocks the pipeline
-- [ ] `playwright test` failure blocks the pipeline
-- [ ] E2E tests connect to a PostgreSQL service container (no mocks)
-- [ ] Pipeline completes in a reasonable time (target: under 5 minutes)
+- [x] Pipeline runs on every push and pull request
+- [x] `tsc --noEmit` failure blocks the pipeline
+- [x] `vitest run` failure blocks the pipeline
+- [x] `playwright test` failure blocks the pipeline
+- [x] E2E tests connect to a PostgreSQL service container (no mocks)
+- [x] Pipeline completes in a reasonable time (target: under 5 minutes)
 
 ## Blocked by
 
