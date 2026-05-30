@@ -71,8 +71,9 @@ export default async function SpielListePage() {
             {spiele.map((spiel) => (
               <li
                 key={spiel.id}
-                className="bg-white rounded-xl shadow-sm border border-gray-100 p-4"
+                className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 hover:border-gray-300 transition-colors"
               >
+                <Link href={`/admin/spiele/${spiel.id}`} className="block">
                 <div className="flex items-start justify-between gap-2">
                   <div>
                     <p className="text-base font-semibold text-gray-800">
@@ -103,6 +104,7 @@ export default async function SpielListePage() {
                     </span>
                   )}
                 </div>
+                </Link>
               </li>
             ))}
           </ul>

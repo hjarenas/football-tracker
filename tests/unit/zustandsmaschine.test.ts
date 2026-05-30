@@ -119,6 +119,33 @@ describe("transition — gibt neuen Status zurück oder wirft", () => {
 });
 
 // ---------------------------------------------------------------------------
+// Ungültige Übersprünge — Schritte dürfen nicht übersprungen werden
+// ---------------------------------------------------------------------------
+describe("transition — ungültige Übersprünge", () => {
+  it("wirft bei Versuch, geplant direkt zu abgeschlossen zu überspringen", () => {
+    expect(() =>
+      transition(SpielStatus.geplant, SpielStatus.abgeschlossen)
+    ).toThrow(ZustandsmaschineError);
+  });
+
+  it("canTransition gibt false zurück für geplant → abgeschlossen (Skip teams_zugewiesen)", () => {
+    expect(canTransition(SpielStatus.geplant, SpielStatus.abgeschlossen)).toBe(false);
+  });
+
+  it("wirft bei Versuch, teams_zugewiesen nach geplant zurückzugehen", () => {
+    expect(() =>
+      transition(SpielStatus.teams_zugewiesen, SpielStatus.geplant)
+    ).toThrow(ZustandsmaschineError);
+  });
+
+  it("teams_zugewiesen → abgeschlossen ist ein erlaubter (nicht überspringender) Übergang", () => {
+    expect(transition(SpielStatus.teams_zugewiesen, SpielStatus.abgeschlossen)).toBe(
+      SpielStatus.abgeschlossen
+    );
+  });
+});
+
+// ---------------------------------------------------------------------------
 // VALID_TRANSITIONS — Vollständigkeit des Transition-Maps
 // ---------------------------------------------------------------------------
 describe("VALID_TRANSITIONS — Transition-Map Vollständigkeit", () => {

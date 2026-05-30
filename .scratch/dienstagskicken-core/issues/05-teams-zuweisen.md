@@ -1,6 +1,6 @@
 # 05 — Teams zuweisen (Step 2)
 
-Status: ready-for-agent
+Status: completed
 
 ## Parent
 
@@ -18,11 +18,11 @@ Covers user stories: 18, 24, 25, 26, 27.
 
 ## Acceptance criteria
 
-- [ ] Admin can assign each attendee to Rot or Gelb from the Spiel detail page
-- [ ] All attendees must be assigned before the transition to `teams_zugewiesen` is allowed
-- [ ] Optional points_override is settable per player
-- [ ] Saved Spiel shows status `teams_zugewiesen`
-- [ ] Spiel-Zustandsmaschine unit tests cover `teams_zugewiesen → abgeschlossen` and invalid skip transitions
+- [x] Admin can assign each attendee to Rot or Gelb from the Spiel detail page
+- [x] All attendees must be assigned before the transition to `teams_zugewiesen` is allowed
+- [x] Optional points_override is settable per player
+- [x] Saved Spiel shows status `teams_zugewiesen`
+- [x] Spiel-Zustandsmaschine unit tests cover `teams_zugewiesen → abgeschlossen` and invalid skip transitions
 
 ## Blocked by
 
