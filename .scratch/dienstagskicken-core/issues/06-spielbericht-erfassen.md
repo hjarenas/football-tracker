@@ -1,6 +1,6 @@
 # 06 — Spielbericht erfassen (Step 3)
 
-Status: ready-for-agent
+Status: completed
 
 ## Parent
 
@@ -26,11 +26,11 @@ Covers user stories: 19, 20, 21, 26, 27.
 
 ## Acceptance criteria
 
-- [ ] Admin can add Tor records with scorer, optional assist, eigentor flag, and team
-- [ ] Eigentore are attributed to the conceding team's score, not the scorer's tally
-- [ ] Derived score is shown correctly in the UI during entry
-- [ ] Spiel transitions to `abgeschlossen` on confirmation
-- [ ] A completed Spiel is visible in the admin Spiel list with the correct derived score
+- [x] Admin can add Tor records with scorer, optional assist, eigentor flag, and team
+- [x] Eigentore are attributed to the conceding team's score, not the scorer's tally
+- [x] Derived score is shown correctly in the UI during entry
+- [x] Spiel transitions to `abgeschlossen` on confirmation
+- [x] A completed Spiel is visible in the admin Spiel list with the correct derived score
 
 ## Blocked by
 

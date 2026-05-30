@@ -149,6 +149,158 @@ export async function teamsZuweisenAction(
   redirect(`/admin/spiele/${spielId}`);
 }
 
+// ---------------------------------------------------------------------------
+// Tor erfassen — Step 3
+// ---------------------------------------------------------------------------
+
+export interface TorErfassenResult {
+  fehler?: string;
+  torId?: string;
+}
+
+/**
+ * Adds a new Tor record to a Spiel (status must be `teams_zugewiesen`).
+ * Returns the new Tor's id on success.
+ */
+export async function torErfassenAction(
+  spielId: string,
+  formData: FormData
+): Promise<TorErfassenResult> {
+  const scorerId = formData.get("scorerId") as string | null;
+  const assistId = formData.get("assistId") as string | null;
+  const eigentorValue = formData.get("eigentor") as string | null;
+  const teamValue = formData.get("team") as string | null;
+
+  if (!scorerId) {
+    return { fehler: "Torschütze ist erforderlich." };
+  }
+  if (!teamValue || (teamValue !== "Rot" && teamValue !== "Gelb")) {
+    return { fehler: "Team ist erforderlich." };
+  }
+  if (assistId && assistId === scorerId) {
+    return { fehler: "Torschütze und Vorlagengeber dürfen nicht identisch sein." };
+  }
+
+  const eigentor = eigentorValue === "true";
+  const team = teamValue as Team;
+
+  try {
+    const spiel = await prisma.spiel.findUnique({
+      where: { id: spielId },
+      select: { status: true },
+    });
+
+    if (!spiel) {
+      return { fehler: "Spiel nicht gefunden." };
+    }
+
+    if (spiel.status !== "teams_zugewiesen") {
+      return { fehler: "Tore können nur bei Status 'teams_zugewiesen' erfasst werden." };
+    }
+
+    const tor = await prisma.tor.create({
+      data: {
+        spielId,
+        scorerId,
+        assistId: assistId || null,
+        eigentor,
+        team,
+      },
+    });
+
+    revalidatePath(`/admin/spiele/${spielId}`);
+    return { torId: tor.id };
+  } catch (e) {
+    console.error("Fehler beim Erfassen des Tores:", e);
+    return { fehler: "Das Tor konnte nicht gespeichert werden." };
+  }
+}
+
+export interface TorLoeschenResult {
+  fehler?: string;
+}
+
+/**
+ * Deletes a Tor record from a Spiel.
+ */
+export async function torLoeschenAction(
+  spielId: string,
+  torId: string
+): Promise<TorLoeschenResult> {
+  try {
+    const spiel = await prisma.spiel.findUnique({
+      where: { id: spielId },
+      select: { status: true },
+    });
+
+    if (!spiel) {
+      return { fehler: "Spiel nicht gefunden." };
+    }
+
+    if (spiel.status !== "teams_zugewiesen") {
+      return { fehler: "Tore können nur bei Status 'teams_zugewiesen' gelöscht werden." };
+    }
+
+    await prisma.tor.delete({ where: { id: torId } });
+
+    revalidatePath(`/admin/spiele/${spielId}`);
+    return {};
+  } catch (e) {
+    console.error("Fehler beim Löschen des Tores:", e);
+    return { fehler: "Das Tor konnte nicht gelöscht werden." };
+  }
+}
+
+export interface SpielAbschliessenResult {
+  fehler?: string;
+}
+
+/**
+ * Transitions a Spiel from `teams_zugewiesen` to `abgeschlossen`.
+ */
+export async function spielAbschliessenAction(
+  spielId: string
+): Promise<SpielAbschliessenResult> {
+  try {
+    const spiel = await prisma.spiel.findUnique({
+      where: { id: spielId },
+      select: { status: true },
+    });
+
+    if (!spiel) {
+      return { fehler: "Spiel nicht gefunden." };
+    }
+
+    try {
+      transition(spiel.status, SpielStatus.abgeschlossen);
+    } catch {
+      return {
+        fehler: `Ungültiger Zustandsübergang: Spiel ist bereits "${spiel.status}".`,
+      };
+    }
+
+    await prisma.spiel.update({
+      where: { id: spielId },
+      data: { status: SpielStatus.abgeschlossen },
+    });
+
+    revalidatePath(`/admin/spiele/${spielId}`);
+    revalidatePath("/admin/spiele");
+  } catch (e) {
+    if (e instanceof Error && e.message.includes("NEXT_REDIRECT")) {
+      throw e;
+    }
+    console.error("Fehler beim Abschließen des Spiels:", e);
+    return { fehler: "Das Spiel konnte nicht abgeschlossen werden." };
+  }
+
+  redirect(`/admin/spiele/${spielId}`);
+}
+
+// ---------------------------------------------------------------------------
+// Helpers
+// ---------------------------------------------------------------------------
+
 /**
  * Returns the next Tuesday from today (or today if today is Tuesday).
  * Returns ISO date string "YYYY-MM-DD".

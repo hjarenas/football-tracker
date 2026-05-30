@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
+import { deriveScore } from "@/lib/score";
 
 const STATUS_LABELS: Record<string, string> = {
   geplant: "Geplant",
@@ -31,6 +32,7 @@ export default async function SpielListePage() {
       bierbringer: { select: { name: true } },
       teilnahmen: { select: { id: true } },
       saison: { select: { jahr: true } },
+      tore: { select: { team: true, eigentor: true } },
     },
   });
 
@@ -83,13 +85,30 @@ export default async function SpielListePage() {
                       Saison {spiel.saison.jahr}
                     </p>
                   </div>
-                  <span
-                    className={`text-xs font-medium px-2 py-1 rounded-full whitespace-nowrap ${
-                      STATUS_COLORS[spiel.status] ?? "bg-gray-100 text-gray-600"
-                    }`}
-                  >
-                    {STATUS_LABELS[spiel.status] ?? spiel.status}
-                  </span>
+                  <div className="flex flex-col items-end gap-1">
+                    <span
+                      className={`text-xs font-medium px-2 py-1 rounded-full whitespace-nowrap ${
+                        STATUS_COLORS[spiel.status] ?? "bg-gray-100 text-gray-600"
+                      }`}
+                    >
+                      {STATUS_LABELS[spiel.status] ?? spiel.status}
+                    </span>
+                    {spiel.status === "abgeschlossen" && (() => {
+                      const ergebnis = deriveScore(
+                        spiel.tore.map((t) => ({
+                          team: t.team as "Rot" | "Gelb",
+                          eigentor: t.eigentor,
+                        }))
+                      );
+                      return (
+                        <span className="text-sm font-bold text-gray-700 tabular-nums">
+                          <span className="text-red-600">{ergebnis.rot}</span>
+                          {" : "}
+                          <span className="text-yellow-600">{ergebnis.gelb}</span>
+                        </span>
+                      );
+                    })()}
+                  </div>
                 </div>
 
                 <div className="mt-3 flex flex-wrap gap-4 text-sm text-gray-600">
