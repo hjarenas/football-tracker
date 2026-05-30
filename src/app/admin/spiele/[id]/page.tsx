@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import TeamsZuweisenFormular from "./TeamsZuweisenFormular";
 import SpielberichtFormular from "./SpielberichtFormular";
 import SpielAbsagenFormular from "./SpielAbsagenFormular";
+import SpielBearbeitenFormular from "./SpielBearbeitenFormular";
 import { deriveScore } from "@/lib/score";
 
 const STATUS_LABELS: Record<string, string> = {
@@ -36,28 +37,35 @@ interface Props {
 export default async function SpielDetailPage({ params }: Props) {
   const { id } = await params;
 
-  const spiel = await prisma.spiel.findUnique({
-    where: { id },
-    include: {
-      saison: { select: { jahr: true } },
-      bierbringer: { select: { name: true } },
-      teilnahmen: {
-        include: {
-          spieler: { select: { id: true, name: true } },
+  const [spiel, alleSpieler] = await Promise.all([
+    prisma.spiel.findUnique({
+      where: { id },
+      include: {
+        saison: { select: { jahr: true } },
+        bierbringer: { select: { id: true, name: true } },
+        teilnahmen: {
+          include: {
+            spieler: { select: { id: true, name: true } },
+          },
+          orderBy: {
+            spieler: { name: "asc" },
+          },
         },
-        orderBy: {
-          spieler: { name: "asc" },
+        tore: {
+          include: {
+            scorer: { select: { id: true, name: true } },
+            assist: { select: { id: true, name: true } },
+          },
+          orderBy: { id: "asc" },
         },
       },
-      tore: {
-        include: {
-          scorer: { select: { id: true, name: true } },
-          assist: { select: { id: true, name: true } },
-        },
-        orderBy: { id: "asc" },
-      },
-    },
-  });
+    }),
+    prisma.spieler.findMany({
+      where: { aktiv: true },
+      orderBy: { name: "asc" },
+      select: { id: true, name: true },
+    }),
+  ]);
 
   if (!spiel) {
     notFound();
@@ -96,6 +104,15 @@ export default async function SpielDetailPage({ params }: Props) {
   const ergebnis = deriveScore(
     spiel.tore.map((t) => ({ team: t.team as "Rot" | "Gelb", eigentor: t.eigentor }))
   );
+
+  // Teilnahmen for the edit formular
+  const teilnahmenFuerBearbeiten = spiel.teilnahmen.map((t) => ({
+    id: t.id,
+    spielerId: t.spieler.id,
+    spielerName: t.spieler.name,
+    team: t.team as "Rot" | "Gelb" | null,
+    punkteOverride: t.punkteOverride as "Rot" | "Gelb" | null,
+  }));
 
   return (
     <main className="min-h-screen bg-gray-50 p-4">
@@ -177,110 +194,131 @@ export default async function SpielDetailPage({ params }: Props) {
           </div>
         )}
 
-        {/* Abgeschlossen — Ergebnis und Spieler anzeigen */}
+        {/* Abgeschlossen — Ergebnis, Spieler anzeigen + Daten bearbeiten */}
         {abgeschlossen && (
-          <div className="bg-white rounded-xl shadow-md p-6">
-            <h2 className="text-lg font-bold text-gray-800 mb-4">Ergebnis</h2>
+          <>
+            {/* Read-only summary card */}
+            <div className="bg-white rounded-xl shadow-md p-6 mb-4">
+              <h2 className="text-lg font-bold text-gray-800 mb-4">Ergebnis</h2>
 
-            {/* Score display */}
-            <div className="flex items-center gap-4 mb-6">
-              <div className="flex-1 rounded-xl border-2 border-red-200 bg-red-50 py-4 text-center">
-                <span className="block text-4xl font-bold text-red-600">
-                  {ergebnis.rot}
-                </span>
-                <span className="text-xs font-semibold uppercase tracking-wide text-red-700 mt-1 block">
-                  Rot
-                </span>
+              {/* Score display */}
+              <div className="flex items-center gap-4 mb-6">
+                <div className="flex-1 rounded-xl border-2 border-red-200 bg-red-50 py-4 text-center">
+                  <span className="block text-4xl font-bold text-red-600">
+                    {ergebnis.rot}
+                  </span>
+                  <span className="text-xs font-semibold uppercase tracking-wide text-red-700 mt-1 block">
+                    Rot
+                  </span>
+                </div>
+                <span className="text-2xl font-bold text-gray-400">:</span>
+                <div className="flex-1 rounded-xl border-2 border-yellow-300 bg-yellow-50 py-4 text-center">
+                  <span className="block text-4xl font-bold text-yellow-600">
+                    {ergebnis.gelb}
+                  </span>
+                  <span className="text-xs font-semibold uppercase tracking-wide text-yellow-700 mt-1 block">
+                    Gelb
+                  </span>
+                </div>
               </div>
-              <span className="text-2xl font-bold text-gray-400">:</span>
-              <div className="flex-1 rounded-xl border-2 border-yellow-300 bg-yellow-50 py-4 text-center">
-                <span className="block text-4xl font-bold text-yellow-600">
-                  {ergebnis.gelb}
-                </span>
-                <span className="text-xs font-semibold uppercase tracking-wide text-yellow-700 mt-1 block">
-                  Gelb
-                </span>
-              </div>
-            </div>
 
-            {/* Teams */}
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <h3 className="text-sm font-bold text-red-700 mb-2 uppercase tracking-wide">
-                  Rot ({spiel.teilnahmen.filter((t) => t.team === "Rot").length})
-                </h3>
-                <ul className="flex flex-col gap-1">
-                  {spiel.teilnahmen
-                    .filter((t) => t.team === "Rot")
-                    .map((t) => (
-                      <li key={t.id} className="text-sm text-gray-700">
-                        {t.spieler.name}
-                        {t.punkteOverride && t.punkteOverride !== t.team && (
-                          <span className="ml-1 text-xs text-gray-400">
-                            (Punkte: {t.punkteOverride})
+              {/* Teams */}
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <h3 className="text-sm font-bold text-red-700 mb-2 uppercase tracking-wide">
+                    Rot ({spiel.teilnahmen.filter((t) => t.team === "Rot").length})
+                  </h3>
+                  <ul className="flex flex-col gap-1">
+                    {spiel.teilnahmen
+                      .filter((t) => t.team === "Rot")
+                      .map((t) => (
+                        <li key={t.id} className="text-sm text-gray-700">
+                          {t.spieler.name}
+                          {t.punkteOverride && t.punkteOverride !== t.team && (
+                            <span className="ml-1 text-xs text-gray-400">
+                              (Punkte: {t.punkteOverride})
+                            </span>
+                          )}
+                        </li>
+                      ))}
+                  </ul>
+                </div>
+                <div>
+                  <h3 className="text-sm font-bold text-yellow-700 mb-2 uppercase tracking-wide">
+                    Gelb ({spiel.teilnahmen.filter((t) => t.team === "Gelb").length})
+                  </h3>
+                  <ul className="flex flex-col gap-1">
+                    {spiel.teilnahmen
+                      .filter((t) => t.team === "Gelb")
+                      .map((t) => (
+                        <li key={t.id} className="text-sm text-gray-700">
+                          {t.spieler.name}
+                          {t.punkteOverride && t.punkteOverride !== t.team && (
+                            <span className="ml-1 text-xs text-gray-400">
+                              (Punkte: {t.punkteOverride})
+                            </span>
+                          )}
+                        </li>
+                      ))}
+                  </ul>
+                </div>
+              </div>
+
+              {/* Torliste */}
+              {spiel.tore.length > 0 && (
+                <div className="mt-5 border-t border-gray-100 pt-4">
+                  <h3 className="text-sm font-semibold text-gray-600 mb-2">
+                    Tore ({spiel.tore.length})
+                  </h3>
+                  <ul className="flex flex-col gap-1.5">
+                    {spiel.tore.map((tor, idx) => (
+                      <li key={tor.id} className="flex items-center gap-2 text-sm text-gray-700">
+                        <span className="text-gray-400 w-5 text-right">{idx + 1}.</span>
+                        <span
+                          className={`rounded-full px-2 py-0.5 text-xs font-semibold ${
+                            tor.team === "Rot"
+                              ? "bg-red-600 text-white"
+                              : "bg-yellow-400 text-yellow-900"
+                          }`}
+                        >
+                          {tor.team}
+                        </span>
+                        {tor.eigentor && (
+                          <span className="rounded-full bg-orange-100 px-2 py-0.5 text-xs font-semibold text-orange-700 border border-orange-200">
+                            ET
+                          </span>
+                        )}
+                        <span>{tor.scorer.name}</span>
+                        {tor.assist && (
+                          <span className="text-xs text-gray-400">
+                            (Vorlage: {tor.assist.name})
                           </span>
                         )}
                       </li>
                     ))}
-                </ul>
-              </div>
-              <div>
-                <h3 className="text-sm font-bold text-yellow-700 mb-2 uppercase tracking-wide">
-                  Gelb ({spiel.teilnahmen.filter((t) => t.team === "Gelb").length})
-                </h3>
-                <ul className="flex flex-col gap-1">
-                  {spiel.teilnahmen
-                    .filter((t) => t.team === "Gelb")
-                    .map((t) => (
-                      <li key={t.id} className="text-sm text-gray-700">
-                        {t.spieler.name}
-                        {t.punkteOverride && t.punkteOverride !== t.team && (
-                          <span className="ml-1 text-xs text-gray-400">
-                            (Punkte: {t.punkteOverride})
-                          </span>
-                        )}
-                      </li>
-                    ))}
-                </ul>
-              </div>
+                  </ul>
+                </div>
+              )}
             </div>
 
-            {/* Torliste */}
-            {spiel.tore.length > 0 && (
-              <div className="mt-5 border-t border-gray-100 pt-4">
-                <h3 className="text-sm font-semibold text-gray-600 mb-2">
-                  Tore ({spiel.tore.length})
-                </h3>
-                <ul className="flex flex-col gap-1.5">
-                  {spiel.tore.map((tor, idx) => (
-                    <li key={tor.id} className="flex items-center gap-2 text-sm text-gray-700">
-                      <span className="text-gray-400 w-5 text-right">{idx + 1}.</span>
-                      <span
-                        className={`rounded-full px-2 py-0.5 text-xs font-semibold ${
-                          tor.team === "Rot"
-                            ? "bg-red-600 text-white"
-                            : "bg-yellow-400 text-yellow-900"
-                        }`}
-                      >
-                        {tor.team}
-                      </span>
-                      {tor.eigentor && (
-                        <span className="rounded-full bg-orange-100 px-2 py-0.5 text-xs font-semibold text-orange-700 border border-orange-200">
-                          ET
-                        </span>
-                      )}
-                      <span>{tor.scorer.name}</span>
-                      {tor.assist && (
-                        <span className="text-xs text-gray-400">
-                          (Vorlage: {tor.assist.name})
-                        </span>
-                      )}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
-          </div>
+            {/* Edit section */}
+            <div className="bg-white rounded-xl shadow-md p-6">
+              <h2 className="text-lg font-bold text-gray-800 mb-1">
+                Spiel bearbeiten
+              </h2>
+              <p className="text-sm text-gray-500 mb-5">
+                Fehler korrigieren — Status bleibt abgeschlossen.
+              </p>
+              <SpielBearbeitenFormular
+                spielId={spiel.id}
+                initialDatum={spiel.datum.toISOString().slice(0, 10)}
+                initialBierbringerId={spiel.bierbringerId ?? null}
+                initialTeilnahmen={teilnahmenFuerBearbeiten}
+                initialTore={toreFuerFormular}
+                alleSpieler={alleSpieler}
+              />
+            </div>
+          </>
         )}
 
         {/* Abgesagt */}

@@ -359,6 +359,321 @@ export async function spielAbsagenAction(
 }
 
 // ---------------------------------------------------------------------------
+// Spiel bearbeiten — Edit actions for completed (abgeschlossen) matches
+// ---------------------------------------------------------------------------
+
+export interface SpielGrunddatenBearbeitenResult {
+  fehler?: string;
+}
+
+/**
+ * Edits the basic data (datum, bierbringer, attendees) of an abgeschlossen Spiel.
+ * Status remains abgeschlossen.
+ */
+export async function spielGrunddatenBearbeitenAction(
+  spielId: string,
+  formData: FormData
+): Promise<SpielGrunddatenBearbeitenResult> {
+  const datumStr = formData.get("datum") as string | null;
+  const bierbringerId = formData.get("bierbringerId") as string | null;
+  const teilnehmerIds = formData.getAll("teilnehmerIds") as string[];
+
+  if (!datumStr) {
+    return { fehler: "Datum ist erforderlich." };
+  }
+  if (teilnehmerIds.length === 0) {
+    return { fehler: "Mindestens ein Teilnehmer muss ausgewählt werden." };
+  }
+
+  try {
+    const spiel = await prisma.spiel.findUnique({
+      where: { id: spielId },
+      include: { teilnahmen: true },
+    });
+
+    if (!spiel) {
+      return { fehler: "Spiel nicht gefunden." };
+    }
+
+    if (spiel.status !== SpielStatus.abgeschlossen) {
+      return { fehler: "Nur abgeschlossene Spiele können bearbeitet werden." };
+    }
+
+    const jahr = new Date(datumStr).getFullYear();
+
+    await prisma.$transaction(async (tx) => {
+      // Upsert Saison for the new year (in case date changes year)
+      const saison = await tx.saison.upsert({
+        where: { jahr },
+        update: {},
+        create: { jahr },
+      });
+
+      // Update Spiel basic fields — status unchanged
+      await tx.spiel.update({
+        where: { id: spielId },
+        data: {
+          datum: new Date(datumStr),
+          bierbringerId: bierbringerId || null,
+          saisonId: saison.id,
+          // status intentionally NOT changed
+        },
+      });
+
+      // Reconcile attendees: add new, remove removed
+      const existingIds = spiel.teilnahmen.map((t) => t.spielerId);
+      const toAdd = teilnehmerIds.filter((id) => !existingIds.includes(id));
+      const toRemove = spiel.teilnahmen.filter(
+        (t) => !teilnehmerIds.includes(t.spielerId)
+      );
+
+      // Remove Teilnahmen that are no longer in the list
+      if (toRemove.length > 0) {
+        await tx.spielteilnahme.deleteMany({
+          where: { id: { in: toRemove.map((t) => t.id) } },
+        });
+      }
+
+      // Add new Teilnahmen (team null — admin must reassign if needed)
+      for (const spielerId of toAdd) {
+        await tx.spielteilnahme.create({
+          data: { spielId, spielerId, team: null },
+        });
+      }
+    });
+
+    revalidatePath(`/admin/spiele/${spielId}`);
+    revalidatePath("/admin/spiele");
+    revalidatePath("/spiele");
+    return {};
+  } catch (e) {
+    if (e instanceof Error && e.message.includes("NEXT_REDIRECT")) {
+      throw e;
+    }
+    console.error("Fehler beim Bearbeiten der Grunddaten:", e);
+    return { fehler: "Die Grunddaten konnten nicht gespeichert werden." };
+  }
+}
+
+export interface TeamsBearbeitenResult {
+  fehler?: string;
+}
+
+/**
+ * Updates team assignments and punkteOverride for an abgeschlossen Spiel.
+ * Status remains abgeschlossen.
+ */
+export async function teamsBearbeitenAction(
+  spielId: string,
+  formData: FormData
+): Promise<TeamsBearbeitenResult> {
+  try {
+    const spiel = await prisma.spiel.findUnique({
+      where: { id: spielId },
+      include: { teilnahmen: true },
+    });
+
+    if (!spiel) {
+      return { fehler: "Spiel nicht gefunden." };
+    }
+
+    if (spiel.status !== SpielStatus.abgeschlossen) {
+      return { fehler: "Nur abgeschlossene Spiele können bearbeitet werden." };
+    }
+
+    const updates: { id: string; team: Team; punkteOverride: Team | null }[] = [];
+
+    for (const teilnahme of spiel.teilnahmen) {
+      const teamValue = formData.get(`team_${teilnahme.id}`) as string | null;
+      if (!teamValue || (teamValue !== "Rot" && teamValue !== "Gelb")) {
+        return { fehler: "Alle Spieler müssen einem Team zugewiesen werden." };
+      }
+      const team = teamValue as Team;
+
+      const overrideValue = formData.get(`override_${teilnahme.id}`) as string | null;
+      let punkteOverride: Team | null = null;
+      if (overrideValue && (overrideValue === "Rot" || overrideValue === "Gelb")) {
+        punkteOverride = overrideValue as Team;
+      }
+
+      updates.push({ id: teilnahme.id, team, punkteOverride });
+    }
+
+    await prisma.$transaction(
+      updates.map(({ id, team, punkteOverride }) =>
+        prisma.spielteilnahme.update({
+          where: { id },
+          data: { team, punkteOverride },
+        })
+      )
+    );
+
+    revalidatePath(`/admin/spiele/${spielId}`);
+    revalidatePath("/spiele");
+    return {};
+  } catch (e) {
+    if (e instanceof Error && e.message.includes("NEXT_REDIRECT")) {
+      throw e;
+    }
+    console.error("Fehler beim Bearbeiten der Teams:", e);
+    return { fehler: "Die Teams konnten nicht gespeichert werden." };
+  }
+}
+
+export interface TorBearbeitenResult {
+  fehler?: string;
+}
+
+/**
+ * Updates an existing Tor record on an abgeschlossen Spiel.
+ */
+export async function torBearbeitenAction(
+  spielId: string,
+  torId: string,
+  formData: FormData
+): Promise<TorBearbeitenResult> {
+  const scorerId = formData.get("scorerId") as string | null;
+  const assistId = formData.get("assistId") as string | null;
+  const eigentorValue = formData.get("eigentor") as string | null;
+  const teamValue = formData.get("team") as string | null;
+
+  if (!scorerId) {
+    return { fehler: "Torschütze ist erforderlich." };
+  }
+  if (!teamValue || (teamValue !== "Rot" && teamValue !== "Gelb")) {
+    return { fehler: "Team ist erforderlich." };
+  }
+  if (assistId && assistId === scorerId) {
+    return { fehler: "Torschütze und Vorlagengeber dürfen nicht identisch sein." };
+  }
+
+  const eigentor = eigentorValue === "true";
+  const team = teamValue as Team;
+
+  try {
+    const spiel = await prisma.spiel.findUnique({
+      where: { id: spielId },
+      select: { status: true },
+    });
+
+    if (!spiel) {
+      return { fehler: "Spiel nicht gefunden." };
+    }
+
+    if (spiel.status !== SpielStatus.abgeschlossen) {
+      return { fehler: "Tore können nur bei abgeschlossenen Spielen bearbeitet werden." };
+    }
+
+    await prisma.tor.update({
+      where: { id: torId },
+      data: {
+        scorerId,
+        assistId: assistId || null,
+        eigentor,
+        team,
+      },
+    });
+
+    revalidatePath(`/admin/spiele/${spielId}`);
+    return {};
+  } catch (e) {
+    console.error("Fehler beim Bearbeiten des Tores:", e);
+    return { fehler: "Das Tor konnte nicht gespeichert werden." };
+  }
+}
+
+export interface TorHinzufuegenAbgeschlossenResult {
+  fehler?: string;
+  torId?: string;
+}
+
+/**
+ * Adds a new Tor record to an abgeschlossen Spiel (to correct data entry mistakes).
+ */
+export async function torHinzufuegenAbgeschlossenAction(
+  spielId: string,
+  formData: FormData
+): Promise<TorHinzufuegenAbgeschlossenResult> {
+  const scorerId = formData.get("scorerId") as string | null;
+  const assistId = formData.get("assistId") as string | null;
+  const eigentorValue = formData.get("eigentor") as string | null;
+  const teamValue = formData.get("team") as string | null;
+
+  if (!scorerId) {
+    return { fehler: "Torschütze ist erforderlich." };
+  }
+  if (!teamValue || (teamValue !== "Rot" && teamValue !== "Gelb")) {
+    return { fehler: "Team ist erforderlich." };
+  }
+  if (assistId && assistId === scorerId) {
+    return { fehler: "Torschütze und Vorlagengeber dürfen nicht identisch sein." };
+  }
+
+  const eigentor = eigentorValue === "true";
+  const team = teamValue as Team;
+
+  try {
+    const spiel = await prisma.spiel.findUnique({
+      where: { id: spielId },
+      select: { status: true },
+    });
+
+    if (!spiel) {
+      return { fehler: "Spiel nicht gefunden." };
+    }
+
+    if (spiel.status !== SpielStatus.abgeschlossen) {
+      return { fehler: "Tore können nur bei abgeschlossenen Spielen hinzugefügt werden." };
+    }
+
+    const tor = await prisma.tor.create({
+      data: { spielId, scorerId, assistId: assistId || null, eigentor, team },
+    });
+
+    revalidatePath(`/admin/spiele/${spielId}`);
+    return { torId: tor.id };
+  } catch (e) {
+    console.error("Fehler beim Hinzufügen des Tores:", e);
+    return { fehler: "Das Tor konnte nicht gespeichert werden." };
+  }
+}
+
+export interface TorLoeschenAbgeschlossenResult {
+  fehler?: string;
+}
+
+/**
+ * Deletes a Tor record from an abgeschlossen Spiel.
+ */
+export async function torLoeschenAbgeschlossenAction(
+  spielId: string,
+  torId: string
+): Promise<TorLoeschenAbgeschlossenResult> {
+  try {
+    const spiel = await prisma.spiel.findUnique({
+      where: { id: spielId },
+      select: { status: true },
+    });
+
+    if (!spiel) {
+      return { fehler: "Spiel nicht gefunden." };
+    }
+
+    if (spiel.status !== SpielStatus.abgeschlossen) {
+      return { fehler: "Tore können nur bei abgeschlossenen Spielen gelöscht werden." };
+    }
+
+    await prisma.tor.delete({ where: { id: torId } });
+
+    revalidatePath(`/admin/spiele/${spielId}`);
+    return {};
+  } catch (e) {
+    console.error("Fehler beim Löschen des Tores:", e);
+    return { fehler: "Das Tor konnte nicht gelöscht werden." };
+  }
+}
+
+// ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
 

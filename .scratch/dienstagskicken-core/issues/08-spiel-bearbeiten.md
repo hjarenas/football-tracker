@@ -1,6 +1,6 @@
 # 08 — Spiel bearbeiten
 
-Status: ready-for-agent
+Status: completed
 
 ## Parent
 
@@ -16,11 +16,11 @@ Covers user story: 23.
 
 ## Acceptance criteria
 
-- [ ] Admin can edit date, beer bringer, and attendees on a completed Spiel
-- [ ] Admin can edit team assignments and points overrides on a completed Spiel
-- [ ] Admin can add, edit, and delete Tor records on a completed Spiel
-- [ ] Spiel status remains `abgeschlossen` after editing
-- [ ] Leaderboard statistics reflect corrections immediately after save
+- [x] Admin can edit date, beer bringer, and attendees on a completed Spiel
+- [x] Admin can edit team assignments and points overrides on a completed Spiel
+- [x] Admin can add, edit, and delete Tor records on a completed Spiel
+- [x] Spiel status remains `abgeschlossen` after editing
+- [x] Leaderboard statistics reflect corrections immediately after save
 
 ## Blocked by
 
