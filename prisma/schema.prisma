@@ -7,7 +7,6 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
 }
 
 // Team enum — only ever Rot or Gelb (from the paper sheet)
@@ -42,7 +41,7 @@ model Spieler {
 // Saison — calendar year
 model Saison {
   id   String @id @default(cuid())
-  jahr Int    @unique // Calendar year, e.g. 2024
+  jahr Int    @unique // Calendar year, e.g. 2026
 
   // Relations
   spiele Spiel[]
@@ -98,7 +97,7 @@ model Tor {
   assistId  String?
 
   // Relations
-  spiel   Spiel   @relation(fields: [spielId], references: [id], onDelete: Cascade)
-  scorer  Spieler @relation("TorScorer", fields: [scorerId], references: [id], onDelete: Restrict)
+  spiel   Spiel    @relation(fields: [spielId], references: [id], onDelete: Cascade)
+  scorer  Spieler  @relation("TorScorer", fields: [scorerId], references: [id], onDelete: Restrict)
   assist  Spieler? @relation("TorAssist", fields: [assistId], references: [id], onDelete: SetNull)
 }

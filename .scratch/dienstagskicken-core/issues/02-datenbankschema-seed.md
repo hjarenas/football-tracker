@@ -1,6 +1,6 @@
 # 02 — Datenbankschema & Seed
 
-Status: ready-for-agent
+Status: completed
 
 ## Parent
 
@@ -24,11 +24,11 @@ Score is never stored — it is always derived from Tor records (see ADR-0002).
 
 ## Acceptance criteria
 
-- [ ] `prisma migrate dev` runs cleanly and creates all tables
-- [ ] `prisma db seed` populates all ~40 Spieler and a current Saison
-- [ ] All foreign key relationships are correctly constrained
-- [ ] Spiel status is enforced as an enum
-- [ ] `tsc --noEmit` passes after schema generation
+- [x] `prisma migrate dev` runs cleanly and creates all tables
+- [x] `prisma db seed` populates all ~40 Spieler and a current Saison
+- [x] All foreign key relationships are correctly constrained
+- [x] Spiel status is enforced as an enum
+- [x] `tsc --noEmit` passes after schema generation
 
 ## Blocked by
 
