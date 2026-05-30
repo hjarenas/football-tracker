@@ -1,6 +1,6 @@
 # 12 — Playwright E2E Suite
 
-Status: ready-for-agent
+Status: completed
 
 ## Parent
 
@@ -24,10 +24,10 @@ Implement the full Playwright E2E test suite covering the golden paths and criti
 
 ## Acceptance criteria
 
-- [ ] All five E2E scenarios pass against a real local DB
-- [ ] Test database is seeded before each test run and torn down after
-- [ ] Tests are runnable with `playwright test` locally and in CI
-- [ ] No test relies on mocked database or API responses
+- [x] All five E2E scenarios pass against a real local DB
+- [x] Test database is seeded before each test run and torn down after
+- [x] Tests are runnable with `playwright test` locally and in CI
+- [x] No test relies on mocked database or API responses
 
 ## Blocked by
 

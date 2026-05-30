@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import { naechstenDienstagBerechnen } from "../actions";
+import { naechstenDienstagBerechnen } from "@/lib/datum-utils";
 import SpielPlanenFormular from "./SpielPlanenFormular";
 import Link from "next/link";
 
