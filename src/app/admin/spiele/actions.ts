@@ -298,6 +298,67 @@ export async function spielAbschliessenAction(
 }
 
 // ---------------------------------------------------------------------------
+// Spiel absagen — Cancel action (only geplant → abgesagt)
+// ---------------------------------------------------------------------------
+
+export interface SpielAbsagenResult {
+  fehler?: string;
+}
+
+/**
+ * Transitions a Spiel from `geplant` to `abgesagt`.
+ * Only Spiele with status `geplant` can be cancelled via this action.
+ * Matches with status `teams_zugewiesen` or `abgeschlossen` are rejected.
+ */
+export async function spielAbsagenAction(
+  spielId: string
+): Promise<SpielAbsagenResult> {
+  try {
+    const spiel = await prisma.spiel.findUnique({
+      where: { id: spielId },
+      select: { status: true },
+    });
+
+    if (!spiel) {
+      return { fehler: "Spiel nicht gefunden." };
+    }
+
+    // Guard: only geplant matches may be cancelled via this action
+    if (spiel.status !== SpielStatus.geplant) {
+      return {
+        fehler: `Nur geplante Spiele können abgesagt werden. Status ist derzeit "${spiel.status}".`,
+      };
+    }
+
+    // Validate via Zustandsmaschine (double-check)
+    try {
+      transition(spiel.status, SpielStatus.abgesagt);
+    } catch {
+      return {
+        fehler: `Ungültiger Zustandsübergang: Spiel ist bereits "${spiel.status}".`,
+      };
+    }
+
+    await prisma.spiel.update({
+      where: { id: spielId },
+      data: { status: SpielStatus.abgesagt },
+    });
+
+    revalidatePath(`/admin/spiele/${spielId}`);
+    revalidatePath("/admin/spiele");
+    revalidatePath("/spiele");
+  } catch (e) {
+    if (e instanceof Error && e.message.includes("NEXT_REDIRECT")) {
+      throw e;
+    }
+    console.error("Fehler beim Absagen des Spiels:", e);
+    return { fehler: "Das Spiel konnte nicht abgesagt werden." };
+  }
+
+  redirect(`/admin/spiele/${spielId}`);
+}
+
+// ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
 

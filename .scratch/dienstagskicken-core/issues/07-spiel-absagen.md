@@ -1,6 +1,6 @@
 # 07 — Spiel absagen
 
-Status: ready-for-agent
+Status: completed
 
 ## Parent
 
@@ -16,12 +16,12 @@ Covers user stories: 11, 22.
 
 ## Acceptance criteria
 
-- [ ] Admin can cancel a Spiel with status `geplant`
-- [ ] Cancellation requires a confirmation step
-- [ ] Cancelled Spiel transitions to `abgesagt`
-- [ ] Matches with status `teams_zugewiesen` or `abgeschlossen` cannot be cancelled
-- [ ] Cancelled Spiel appears in the public match list labelled `Abgesagt`
-- [ ] Cancelled Spiel is excluded from all leaderboard statistics
+- [x] Admin can cancel a Spiel with status `geplant`
+- [x] Cancellation requires a confirmation step
+- [x] Cancelled Spiel transitions to `abgesagt`
+- [x] Matches with status `teams_zugewiesen` or `abgeschlossen` cannot be cancelled
+- [x] Cancelled Spiel appears in the public match list labelled `Abgesagt`
+- [x] Cancelled Spiel is excluded from all leaderboard statistics
 
 ## Blocked by
 

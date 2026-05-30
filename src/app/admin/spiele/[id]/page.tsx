@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import TeamsZuweisenFormular from "./TeamsZuweisenFormular";
 import SpielberichtFormular from "./SpielberichtFormular";
+import SpielAbsagenFormular from "./SpielAbsagenFormular";
 import { deriveScore } from "@/lib/score";
 
 const STATUS_LABELS: Record<string, string> = {
@@ -155,6 +156,7 @@ export default async function SpielDetailPage({ params }: Props) {
               spielId={spiel.id}
               teilnahmen={teilnahmenFuerFormular}
             />
+            <SpielAbsagenFormular spielId={spiel.id} />
           </div>
         )}
 
