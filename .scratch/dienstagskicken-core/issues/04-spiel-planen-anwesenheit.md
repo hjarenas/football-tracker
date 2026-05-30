@@ -1,6 +1,6 @@
 # 04 — Spiel planen + Anwesenheit (Step 1)
 
-Status: ready-for-agent
+Status: completed
 
 ## Parent
 
@@ -23,12 +23,12 @@ Covers user stories: 16, 17, 26, 27.
 
 ## Acceptance criteria
 
-- [ ] Admin can create a new Spiel at `/admin/spiele/neu`
-- [ ] Date field defaults to the next Tuesday
-- [ ] Beer bringer and attendees are selectable from the active Spieler list
-- [ ] Saved Spiel appears in the admin Spiel list with status `geplant`
-- [ ] Spielteilnahme records are created for each attendee
-- [ ] Unit tests cover valid and invalid Spiel-Zustandsmaschine transitions from `geplant`
+- [x] Admin can create a new Spiel at `/admin/spiele/neu`
+- [x] Date field defaults to the next Tuesday
+- [x] Beer bringer and attendees are selectable from the active Spieler list
+- [x] Saved Spiel appears in the admin Spiel list with status `geplant`
+- [x] Spielteilnahme records are created for each attendee
+- [x] Unit tests cover valid and invalid Spiel-Zustandsmaschine transitions from `geplant`
 
 ## Blocked by
 

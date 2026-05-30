@@ -4,7 +4,10 @@
       "Bash(*)",
       "WebFetch(*)",
       "WebSearch(*)",
-      "PowerShell(*)"
+      "PowerShell(*)",
+      "Edit(*)",
+      "Write(*)",
+      "Read(*)"
     ]
   }
 }

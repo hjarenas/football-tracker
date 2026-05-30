@@ -79,10 +79,28 @@ describe("Prisma Schema — Type shapes", () => {
     expect(spiel.bierbringerId).toBeNull();
   });
 
-  it("Spielteilnahme-Typ hat team und optionalen punkteOverride", () => {
+  it("Spielteilnahme-Typ hat optionales team (null bis Step 2) und optionalen punkteOverride", () => {
     const teilnahme: {
       id: string;
-      team: Team;
+      team: Team | null;
+      punkteOverride: Team | null;
+      spielerId: string;
+      spielId: string;
+    } = {
+      id: "teilnahme-id",
+      team: null, // unassigned at Step 1
+      punkteOverride: null,
+      spielerId: "spieler-id",
+      spielId: "spiel-id",
+    };
+    expect(teilnahme.team).toBeNull();
+    expect(teilnahme.punkteOverride).toBeNull();
+  });
+
+  it("Spielteilnahme-Typ kann team Rot oder Gelb haben (nach Step 2)", () => {
+    const teilnahme: {
+      id: string;
+      team: Team | null;
       punkteOverride: Team | null;
       spielerId: string;
       spielId: string;

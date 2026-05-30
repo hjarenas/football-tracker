@@ -1,5 +1,6 @@
 import { auth, signOut } from "@/lib/auth";
 import { redirect } from "next/navigation";
+import Link from "next/link";
 
 export default async function AdminPage() {
   const session = await auth();
@@ -19,9 +20,15 @@ export default async function AdminPage() {
         </p>
 
         <div className="flex flex-col gap-3">
-          <p className="text-gray-600 text-sm">
+          <p className="text-gray-600 text-sm mb-2">
             Willkommen im Verwaltungsbereich von Dienstagskicken.
           </p>
+          <Link
+            href="/admin/spiele"
+            className="w-full py-2 px-4 bg-gray-800 text-white text-center font-semibold rounded-lg hover:bg-gray-700 transition-colors text-sm"
+          >
+            Spiele verwalten
+          </Link>
         </div>
 
         <form

@@ -67,10 +67,10 @@ model Spiel {
 }
 
 // Spielteilnahme — match participation (join: Spieler × Spiel)
-// Records which team a player played for and optional points override
+// team is null at Step 1 (geplant); assigned in Step 2 (teams_zugewiesen)
 model Spielteilnahme {
   id             String  @id @default(cuid())
-  team           Team
+  team           Team?   // Null until teams are assigned (Step 2)
   punkteOverride Team?   // Override: which team gets the points (null = use match result)
 
   // Foreign keys
