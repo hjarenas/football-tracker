@@ -1,6 +1,6 @@
 # 01 — Projekt-Setup
 
-Status: ready-for-agent
+Status: completed
 
 ## Parent
 
@@ -21,13 +21,13 @@ Scaffold the full project with all tooling in place so every subsequent slice ha
 
 ## Acceptance criteria
 
-- [ ] `docker-compose up` starts the app and a local PostgreSQL instance
-- [ ] The app renders a placeholder page at `/`
-- [ ] `vitest run` passes (at least one placeholder test)
-- [ ] `playwright test` passes (at least one placeholder test against the running app)
-- [ ] `tsc --noEmit` passes with no type errors
-- [ ] shadcn/ui is initialised; Rot (#ef4444) and Gelb (#eab308) are defined as Tailwind CSS variables
-- [ ] All required env vars are documented in `.env.example`
+- [x] `docker-compose up` starts the app and a local PostgreSQL instance
+- [x] The app renders a placeholder page at `/`
+- [x] `vitest run` passes (at least one placeholder test)
+- [x] `playwright test` passes (at least one placeholder test against the running app)
+- [x] `tsc --noEmit` passes with no type errors
+- [x] shadcn/ui is initialised; Rot (#ef4444) and Gelb (#eab308) are defined as Tailwind CSS variables
+- [x] All required env vars are documented in `.env.example`
 
 ## Blocked by
 
