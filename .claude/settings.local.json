@@ -4,7 +4,8 @@
       "Bash(rtk ls *)",
       "WebFetch(domain:raw.githubusercontent.com)",
       "Bash(rtk gh *)",
-      "Bash(rtk init *)"
+      "Bash(rtk init *)",
+      "Bash(rtk git *)"
     ]
   }
 }
