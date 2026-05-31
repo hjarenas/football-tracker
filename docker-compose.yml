@@ -5,7 +5,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-      target: development
+      target: runner
     ports:
       - "3000:3000"
     environment:
@@ -13,7 +13,7 @@ services:
       - NEXTAUTH_URL=http://localhost:3000
       - NEXTAUTH_SECRET=${NEXTAUTH_SECRET:-dev-secret-change-in-production}
       - ADMIN_CREDENTIALS=${ADMIN_CREDENTIALS:-admin:password}
-    command: sh -c "npx prisma migrate deploy && npm run build && cp -r public .next/standalone/public && cp -r .next/static .next/standalone/.next/ && node .next/standalone/server.js"
+    command: sh -c "node server.js"
     depends_on:
       db:
         condition: service_healthy

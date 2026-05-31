@@ -1,23 +1,16 @@
 import { auth } from "@/lib/auth";
 import { NextResponse } from "next/server";
-import type { NextRequest } from "next/server";
-import { isAdminPath, isAuthenticatedSession } from "@/lib/auth-utils";
+import { isAdminPath } from "@/lib/auth-utils";
 
-export async function middleware(request: NextRequest) {
-  const session = await auth();
-
-  if (isAdminPath(request.nextUrl.pathname) && !isAuthenticatedSession(session)) {
-    const siteUrl = process.env.NEXTAUTH_URL ?? `http://${request.headers.get("host")}`;
+export default auth((req) => {
+  if (isAdminPath(req.nextUrl.pathname) && !req.auth) {
+    const siteUrl = process.env.NEXTAUTH_URL ?? `http://${req.headers.get("host")}`;
     const loginUrl = new URL("/anmelden", siteUrl);
-    loginUrl.searchParams.set(
-      "callbackUrl",
-      new URL(request.nextUrl.pathname + request.nextUrl.search, siteUrl).href
-    );
+    loginUrl.searchParams.set("callbackUrl", req.nextUrl.href);
     return NextResponse.redirect(loginUrl);
   }
-
   return NextResponse.next();
-}
+});
 
 export const config = {
   matcher: ["/admin/:path*"],

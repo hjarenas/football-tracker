@@ -165,10 +165,20 @@ export default async function HomePage({ searchParams }: HomePageProps) {
       {/* Header */}
       <div className="bg-white border-b border-gray-100 shadow-sm">
         <div className="w-full max-w-lg mx-auto px-4 py-5">
-          <h1 className="text-2xl font-bold text-gray-900">Dienstagskicken</h1>
-          <p className="text-sm text-gray-500 mt-0.5">
-            Fußball-Tracker · Vereins Weißkirchen
-          </p>
+          <div className="flex items-start justify-between">
+            <div>
+              <h1 className="text-2xl font-bold text-gray-900">Dienstagskicken</h1>
+              <p className="text-sm text-gray-500 mt-0.5">
+                Fußball-Tracker · Vereins Weißkirchen
+              </p>
+            </div>
+            <Link
+              href="/anmelden"
+              className="text-xs font-medium text-gray-500 hover:text-gray-800 border border-gray-200 rounded-lg px-3 py-1.5 hover:border-gray-400 transition-colors"
+            >
+              Verwaltung
+            </Link>
+          </div>
         </div>
       </div>
 
@@ -226,12 +236,6 @@ export default async function HomePage({ searchParams }: HomePageProps) {
           einheitPlural="Mal"
         />
 
-        {/* Footer links */}
-        <div className="flex justify-center gap-4 pt-4 text-xs text-gray-400">
-          <Link href="/anmelden" className="hover:text-gray-600">
-            Verwaltung
-          </Link>
-        </div>
       </div>
     </main>
   );
