@@ -7,8 +7,12 @@ export async function middleware(request: NextRequest) {
   const session = await auth();
 
   if (isAdminPath(request.nextUrl.pathname) && !isAuthenticatedSession(session)) {
-    const loginUrl = new URL("/anmelden", request.url);
-    loginUrl.searchParams.set("callbackUrl", request.url);
+    const siteUrl = process.env.NEXTAUTH_URL ?? `http://${request.headers.get("host")}`;
+    const loginUrl = new URL("/anmelden", siteUrl);
+    loginUrl.searchParams.set(
+      "callbackUrl",
+      new URL(request.nextUrl.pathname + request.nextUrl.search, siteUrl).href
+    );
     return NextResponse.redirect(loginUrl);
   }
 
