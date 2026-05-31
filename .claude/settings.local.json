@@ -7,7 +7,12 @@
       "PowerShell(*)",
       "Edit(*)",
       "Write(*)",
-      "Read(*)"
+      "Read(*)",
+      "Bash(docker compose *)"
     ]
-  }
+  },
+  "enabledMcpjsonServers": [
+    "code-review-graph"
+  ],
+  "enableAllProjectMcpServers": true
 }
