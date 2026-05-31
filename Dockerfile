@@ -28,7 +28,9 @@ COPY . .
 
 ENV NEXT_TELEMETRY_DISABLED=1
 
-RUN npm run build
+RUN DATABASE_URL="postgresql://build:build@localhost:5432/build" npx prisma generate && \
+    DATABASE_URL="postgresql://build:build@localhost:5432/build" npm run build && \
+    mkdir -p public
 
 # Production image
 FROM base AS runner
@@ -45,6 +47,10 @@ COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 COPY --from=builder --chown=nextjs:nodejs /app/prisma ./prisma
 COPY --from=builder --chown=nextjs:nodejs /app/prisma.config.ts ./prisma.config.ts
+# Copy full node_modules from builder so prisma migrate deploy has all its deps
+# (prisma CLI, @prisma/engines, @prisma/config and their transitive deps).
+# These sit alongside the standalone output; standalone's own node_modules takes precedence.
+COPY --from=builder --chown=nextjs:nodejs /app/node_modules ./node_modules
 
 USER nextjs
 

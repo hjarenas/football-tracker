@@ -1,6 +1,6 @@
 # 15 — Prisma migrations in runner container without npx download
 
-Status: ready-for-agent
+Status: done
 
 ## Parent
 
