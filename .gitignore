@@ -38,3 +38,5 @@ yarn-error.log*
 next-env.d.ts
 # Added by code-review-graph
 .code-review-graph/
+
+.claude/worktrees

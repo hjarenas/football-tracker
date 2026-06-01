@@ -10,7 +10,7 @@ Football tracker application. No stack has been chosen yet — use `/grill-me` b
 
 **RTK** is configured globally. Always prefix shell commands with `rtk` (e.g. `rtk git status`, `rtk tsc`, `rtk vitest run`). See global CLAUDE.md for the full command reference.
 
-**CodeGraph** semantic indexing is available via MCP. Use `codegraph_search`, `codegraph_context`, and related tools for structural questions instead of file-scanning sub-agents.
+**CodeGraph** semantic indexing is available via MCP. Use `codegraph_search`, `codegraph_context`, and related tools for structural questions instead of file-scanning sub-agents. ALWAYS USE THIS AND PREFER THIS OVER READING FILES yourself/finding for patterns. 
 
 ## Skills Available
 

@@ -11,8 +11,9 @@
       "Bash(docker compose *)",
       "mcp__code-review-graph__get_minimal_context_tool",
       "mcp__code-review-graph__get_architecture_overview_tool",
-      "mcp__code-review-graph__list_flows_tool",      
-      "mcp__code-review-*"
+      "mcp__code-review-graph__list_flows_tool",
+      "mcp__code-review-graph__*",
+      "mcp__code-review-graph__semantic_search_nodes_tool"
     ]
   },
   "enableAllProjectMcpServers": true,

@@ -47,10 +47,11 @@ COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 COPY --from=builder --chown=nextjs:nodejs /app/prisma ./prisma
 COPY --from=builder --chown=nextjs:nodejs /app/prisma.config.ts ./prisma.config.ts
-# Copy full node_modules from builder so prisma migrate deploy has all its deps
-# (prisma CLI, @prisma/engines, @prisma/config and their transitive deps).
-# These sit alongside the standalone output; standalone's own node_modules takes precedence.
-COPY --from=builder --chown=nextjs:nodejs /app/node_modules ./node_modules
+# Copy full node_modules from deps (clean npm ci — guaranteed .bin/prisma symlink).
+# The standalone output's traced node_modules land first; this overlays the full set on top.
+COPY --from=deps --chown=nextjs:nodejs /app/node_modules ./node_modules
+# Restore generated Prisma client (created by prisma generate in builder, absent in deps).
+COPY --from=builder --chown=nextjs:nodejs /app/node_modules/.prisma ./node_modules/.prisma
 
 USER nextjs
 
