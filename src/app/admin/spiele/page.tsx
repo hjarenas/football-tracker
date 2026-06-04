@@ -10,10 +10,10 @@ const STATUS_LABELS: Record<string, string> = {
 };
 
 const STATUS_COLORS: Record<string, string> = {
-  geplant: "bg-blue-100 text-blue-800",
-  teams_zugewiesen: "bg-yellow-100 text-yellow-800",
-  abgeschlossen: "bg-green-100 text-green-800",
-  abgesagt: "bg-gray-100 text-gray-500 line-through",
+  geplant: "bg-blue-900/60 text-blue-300",
+  teams_zugewiesen: "bg-yellow-900/60 text-yellow-300",
+  abgeschlossen: "bg-green-900/60 text-green-300",
+  abgesagt: "bg-gray-700 text-gray-400 line-through",
 };
 
 function formatDatum(datum: Date): string {
@@ -37,33 +37,24 @@ export default async function SpielListePage() {
   });
 
   return (
-    <main className="min-h-screen bg-gray-50 p-4">
-      <div className="w-full max-w-2xl mx-auto">
-        <div className="mb-4">
-          <Link
-            href="/admin"
-            className="text-sm text-gray-500 hover:text-gray-700"
-          >
-            ← Zurück zur Verwaltung
-          </Link>
-        </div>
-
-        <div className="flex items-center justify-between mb-4">
-          <h1 className="text-2xl font-bold text-gray-800">Spiele</h1>
+    <main className="min-h-screen pb-12">
+      <div className="max-w-2xl mx-auto px-4 pt-6">
+        <div className="flex items-center justify-between mb-5">
+          <h1 className="text-xl font-bold text-gray-100">Spiele</h1>
           <Link
             href="/admin/spiele/neu"
-            className="inline-flex items-center gap-1 py-2 px-4 bg-gray-800 text-white text-sm font-semibold rounded-lg hover:bg-gray-700 transition-colors"
+            className="inline-flex items-center gap-1 py-2 px-4 bg-red-600 hover:bg-red-500 text-white text-sm font-semibold rounded-lg transition-colors"
           >
             + Neues Spiel
           </Link>
         </div>
 
         {spiele.length === 0 ? (
-          <div className="bg-white rounded-xl shadow-md p-8 text-center">
+          <div className="bg-gray-800 rounded-xl border border-gray-700 p-8 text-center">
             <p className="text-gray-500 mb-4">Noch keine Spiele geplant.</p>
             <Link
               href="/admin/spiele/neu"
-              className="inline-flex items-center gap-1 py-2 px-4 bg-gray-800 text-white text-sm font-semibold rounded-lg hover:bg-gray-700 transition-colors"
+              className="inline-flex items-center gap-1 py-2 px-4 bg-red-600 hover:bg-red-500 text-white text-sm font-semibold rounded-lg transition-colors"
             >
               Erstes Spiel planen
             </Link>
@@ -73,56 +64,66 @@ export default async function SpielListePage() {
             {spiele.map((spiel) => (
               <li
                 key={spiel.id}
-                className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 hover:border-gray-300 transition-colors"
+                className="bg-gray-800 rounded-xl border border-gray-700 p-4 hover:border-gray-600 transition-colors"
               >
                 <Link href={`/admin/spiele/${spiel.id}`} className="block">
-                <div className="flex items-start justify-between gap-2">
-                  <div>
-                    <p className="text-base font-semibold text-gray-800">
-                      {formatDatum(spiel.datum)}
-                    </p>
-                    <p className="text-xs text-gray-400 mt-0.5">
-                      Saison {spiel.saison.jahr}
-                    </p>
+                  <div className="flex items-start justify-between gap-2">
+                    <div>
+                      <p className="text-base font-semibold text-gray-100">
+                        {formatDatum(spiel.datum)}
+                      </p>
+                      <p className="text-xs text-gray-500 mt-0.5">
+                        Saison {spiel.saison.jahr}
+                      </p>
+                    </div>
+                    <div className="flex flex-col items-end gap-1">
+                      <span
+                        className={`text-xs font-medium px-2 py-1 rounded-full whitespace-nowrap ${
+                          STATUS_COLORS[spiel.status] ??
+                          "bg-gray-700 text-gray-400"
+                        }`}
+                      >
+                        {STATUS_LABELS[spiel.status] ?? spiel.status}
+                      </span>
+                      {spiel.status === "abgeschlossen" &&
+                        (() => {
+                          const ergebnis = deriveScore(
+                            spiel.tore.map((t) => ({
+                              team: t.team as "Rot" | "Gelb",
+                              eigentor: t.eigentor,
+                            }))
+                          );
+                          return (
+                            <span className="text-sm font-bold tabular-nums">
+                              <span className="text-red-400">
+                                {ergebnis.rot}
+                              </span>
+                              <span className="text-gray-600">{" : "}</span>
+                              <span className="text-yellow-400">
+                                {ergebnis.gelb}
+                              </span>
+                            </span>
+                          );
+                        })()}
+                    </div>
                   </div>
-                  <div className="flex flex-col items-end gap-1">
-                    <span
-                      className={`text-xs font-medium px-2 py-1 rounded-full whitespace-nowrap ${
-                        STATUS_COLORS[spiel.status] ?? "bg-gray-100 text-gray-600"
-                      }`}
-                    >
-                      {STATUS_LABELS[spiel.status] ?? spiel.status}
-                    </span>
-                    {spiel.status === "abgeschlossen" && (() => {
-                      const ergebnis = deriveScore(
-                        spiel.tore.map((t) => ({
-                          team: t.team as "Rot" | "Gelb",
-                          eigentor: t.eigentor,
-                        }))
-                      );
-                      return (
-                        <span className="text-sm font-bold text-gray-700 tabular-nums">
-                          <span className="text-red-600">{ergebnis.rot}</span>
-                          {" : "}
-                          <span className="text-yellow-600">{ergebnis.gelb}</span>
-                        </span>
-                      );
-                    })()}
-                  </div>
-                </div>
 
-                <div className="mt-3 flex flex-wrap gap-4 text-sm text-gray-600">
-                  <span>
-                    <span className="font-medium">Teilnehmer:</span>{" "}
-                    {spiel.teilnahmen.length}
-                  </span>
-                  {spiel.bierbringer && (
+                  <div className="mt-3 flex flex-wrap gap-4 text-sm text-gray-400">
                     <span>
-                      <span className="font-medium">Bierbringer:</span>{" "}
-                      {spiel.bierbringer.name}
+                      <span className="font-medium text-gray-300">
+                        Teilnehmer:
+                      </span>{" "}
+                      {spiel.teilnahmen.length}
                     </span>
-                  )}
-                </div>
+                    {spiel.bierbringer && (
+                      <span>
+                        <span className="font-medium text-gray-300">
+                          Bierbringer:
+                        </span>{" "}
+                        {spiel.bierbringer.name}
+                      </span>
+                    )}
+                  </div>
                 </Link>
               </li>
             ))}

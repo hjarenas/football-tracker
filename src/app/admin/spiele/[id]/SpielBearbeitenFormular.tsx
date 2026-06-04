@@ -35,20 +35,20 @@ interface Tor {
 
 interface Props {
   spielId: string;
-  initialDatum: string; // ISO date string "YYYY-MM-DD"
+  initialDatum: string;
   initialBierbringerId: string | null;
   initialTeilnahmen: Teilnahme[];
   initialTore: Tor[];
-  alleSpieler: Spieler[]; // all active players
+  alleSpieler: Spieler[];
 }
 
 const TEAM_STYLES: Record<Team, { button: string; active: string }> = {
   Rot: {
-    button: "border-red-300 text-red-700 hover:bg-red-50",
+    button: "border-red-700/60 text-red-400 hover:bg-red-900/20",
     active: "bg-red-600 text-white border-red-600",
   },
   Gelb: {
-    button: "border-yellow-400 text-yellow-700 hover:bg-yellow-50",
+    button: "border-yellow-700/60 text-yellow-400 hover:bg-yellow-900/20",
     active: "bg-yellow-400 text-yellow-900 border-yellow-400",
   },
 };
@@ -103,20 +103,17 @@ export default function SpielBearbeitenFormular({
   const [torFehler, setTorFehler] = useState<string | null>(null);
   const [isPendingTor, startTor] = useTransition();
 
-  // Tor hinzufügen form state
   const [scorerId, setScorerId] = useState("");
   const [assistId, setAssistId] = useState("");
   const [eigentor, setEigentor] = useState(false);
   const [torTeam, setTorTeam] = useState<Team | "">("");
 
-  // Tor bearbeiten
   const [bearbeitenTorId, setBearbeitenTorId] = useState<string | null>(null);
   const [editScorerId, setEditScorerId] = useState("");
   const [editAssistId, setEditAssistId] = useState("");
   const [editEigentor, setEditEigentor] = useState(false);
   const [editTorTeam, setEditTorTeam] = useState<Team | "">("");
 
-  // Players with assigned teams (for goal entry)
   const spielerMitTeam = teilnahmen
     .filter((t) => teams[t.id])
     .map((t) => ({
@@ -200,7 +197,6 @@ export default function SpielBearbeitenFormular({
       if (result.fehler) {
         setTeamsFehler(result.fehler);
       } else {
-        // Update local teilnahmen state with new team assignments
         setTeilnahmen((prev) =>
           prev.map((t) => ({
             ...t,
@@ -341,60 +337,58 @@ export default function SpielBearbeitenFormular({
     <div className="flex flex-col gap-4">
       {/* Aktuelles Ergebnis */}
       <div className="flex items-center gap-4 mb-2">
-        <div className="flex-1 rounded-xl border-2 border-red-200 bg-red-50 py-4 text-center">
-          <span className="block text-4xl font-bold text-red-600">{ergebnis.rot}</span>
-          <span className="text-xs font-semibold uppercase tracking-wide text-red-700 mt-1 block">Rot</span>
+        <div className="flex-1 rounded-xl border-2 border-red-800/60 bg-red-900/30 py-4 text-center">
+          <span className="block text-4xl font-bold text-red-400">{ergebnis.rot}</span>
+          <span className="text-xs font-semibold uppercase tracking-wide text-red-400 mt-1 block">Rot</span>
         </div>
-        <span className="text-2xl font-bold text-gray-400">:</span>
-        <div className="flex-1 rounded-xl border-2 border-yellow-300 bg-yellow-50 py-4 text-center">
-          <span className="block text-4xl font-bold text-yellow-600">{ergebnis.gelb}</span>
-          <span className="text-xs font-semibold uppercase tracking-wide text-yellow-700 mt-1 block">Gelb</span>
+        <span className="text-2xl font-bold text-gray-500">:</span>
+        <div className="flex-1 rounded-xl border-2 border-yellow-800/60 bg-yellow-900/30 py-4 text-center">
+          <span className="block text-4xl font-bold text-yellow-400">{ergebnis.gelb}</span>
+          <span className="text-xs font-semibold uppercase tracking-wide text-yellow-400 mt-1 block">Gelb</span>
         </div>
       </div>
 
       {/* Section buttons */}
       <div className="flex flex-col gap-2">
         {/* ---- Grunddaten ---- */}
-        <div className="rounded-xl border border-gray-100 bg-white shadow-sm overflow-hidden">
+        <div className="rounded-xl border border-gray-700 bg-gray-900/40 overflow-hidden">
           <button
             type="button"
             onClick={() =>
               setAktiverSchritt((prev) => (prev === "grunddaten" ? null : "grunddaten"))
             }
-            className="w-full flex items-center justify-between px-4 py-3 text-left hover:bg-gray-50 transition-colors"
+            className="w-full flex items-center justify-between px-4 py-3 text-left hover:bg-gray-700/30 transition-colors"
           >
-            <span className="text-sm font-semibold text-gray-800">Grunddaten bearbeiten</span>
-            <span className="text-xs text-gray-400">
+            <span className="text-sm font-semibold text-gray-100">Grunddaten bearbeiten</span>
+            <span className="text-xs text-gray-500">
               {aktiverSchritt === "grunddaten" ? "▲" : "▼"}
             </span>
           </button>
 
           {aktiverSchritt === "grunddaten" && (
-            <div className="border-t border-gray-100 p-4">
+            <div className="border-t border-gray-700 p-4">
               <form onSubmit={handleGrunddatenSpeichern} className="flex flex-col gap-4">
-                {/* Datum */}
                 <div>
-                  <label className="block text-xs font-medium text-gray-600 mb-1">
-                    Datum <span className="text-red-500">*</span>
+                  <label className="block text-xs font-medium text-gray-300 mb-1">
+                    Datum <span className="text-red-400">*</span>
                   </label>
                   <input
                     type="date"
                     required
                     value={datum}
                     onChange={(e) => setDatum(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-gray-800"
+                    className="w-full px-3 py-2 bg-gray-900 border border-gray-600 rounded-lg text-sm text-gray-100 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
                   />
                 </div>
 
-                {/* Bierbringer */}
                 <div>
-                  <label className="block text-xs font-medium text-gray-600 mb-1">
+                  <label className="block text-xs font-medium text-gray-300 mb-1">
                     Bierbringer
                   </label>
                   <select
                     value={bierbringerId}
                     onChange={(e) => setBierbringerId(e.target.value)}
-                    className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-gray-800 focus:border-gray-400 focus:outline-none"
+                    className="w-full rounded-lg border border-gray-600 bg-gray-900 px-3 py-2 text-sm text-gray-100 focus:border-gray-400 focus:outline-none"
                   >
                     <option value="">— Keiner —</option>
                     {alleSpieler.map((s) => (
@@ -405,31 +399,30 @@ export default function SpielBearbeitenFormular({
                   </select>
                 </div>
 
-                {/* Teilnehmer */}
                 <div>
-                  <label className="block text-xs font-medium text-gray-600 mb-2">
-                    Teilnehmer <span className="text-red-500">*</span>{" "}
-                    <span className="text-gray-400 font-normal">
+                  <label className="block text-xs font-medium text-gray-300 mb-2">
+                    Teilnehmer <span className="text-red-400">*</span>{" "}
+                    <span className="text-gray-500 font-normal">
                       ({ausgewaehlteTeilnehmer.size} ausgewählt)
                     </span>
                   </label>
-                  <div className="border border-gray-200 rounded-lg max-h-48 overflow-y-auto divide-y divide-gray-100">
+                  <div className="border border-gray-600 rounded-lg max-h-48 overflow-y-auto divide-y divide-gray-700">
                     {alleSpieler.map((s) => {
                       const checked = ausgewaehlteTeilnehmer.has(s.id);
                       return (
                         <label
                           key={s.id}
-                          className={`flex items-center gap-3 px-4 py-2.5 cursor-pointer hover:bg-gray-50 ${
-                            checked ? "bg-blue-50" : ""
+                          className={`flex items-center gap-3 px-4 py-2.5 cursor-pointer transition-colors ${
+                            checked ? "bg-blue-900/30 hover:bg-blue-900/40" : "hover:bg-gray-700/40"
                           }`}
                         >
                           <input
                             type="checkbox"
                             checked={checked}
                             onChange={() => toggleTeilnehmer(s.id)}
-                            className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                            className="h-4 w-4 rounded border-gray-600 text-blue-600 focus:ring-blue-500"
                           />
-                          <span className="text-sm text-gray-700">{s.name}</span>
+                          <span className="text-sm text-gray-100">{s.name}</span>
                         </label>
                       );
                     })}
@@ -437,7 +430,7 @@ export default function SpielBearbeitenFormular({
                 </div>
 
                 {grunddatenFehler && (
-                  <p role="alert" className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-600">
+                  <p role="alert" className="rounded-lg border border-red-700/60 bg-red-900/40 px-3 py-2 text-sm text-red-400">
                     {grunddatenFehler}
                   </p>
                 )}
@@ -446,14 +439,14 @@ export default function SpielBearbeitenFormular({
                   <button
                     type="button"
                     onClick={() => setAktiverSchritt(null)}
-                    className="flex-1 rounded-lg border border-gray-200 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+                    className="flex-1 rounded-lg border border-gray-600 px-4 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 transition-colors"
                   >
                     Abbrechen
                   </button>
                   <button
                     type="submit"
                     disabled={isPendingGrunddaten}
-                    className="flex-1 rounded-lg bg-gray-800 px-4 py-2 text-sm font-semibold text-white hover:bg-gray-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="flex-1 rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white hover:bg-red-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {isPendingGrunddaten ? "Speichern..." : "Speichern"}
                   </button>
@@ -464,22 +457,22 @@ export default function SpielBearbeitenFormular({
         </div>
 
         {/* ---- Teams ---- */}
-        <div className="rounded-xl border border-gray-100 bg-white shadow-sm overflow-hidden">
+        <div className="rounded-xl border border-gray-700 bg-gray-900/40 overflow-hidden">
           <button
             type="button"
             onClick={() =>
               setAktiverSchritt((prev) => (prev === "teams" ? null : "teams"))
             }
-            className="w-full flex items-center justify-between px-4 py-3 text-left hover:bg-gray-50 transition-colors"
+            className="w-full flex items-center justify-between px-4 py-3 text-left hover:bg-gray-700/30 transition-colors"
           >
-            <span className="text-sm font-semibold text-gray-800">Teams bearbeiten</span>
-            <span className="text-xs text-gray-400">
+            <span className="text-sm font-semibold text-gray-100">Teams bearbeiten</span>
+            <span className="text-xs text-gray-500">
               {aktiverSchritt === "teams" ? "▲" : "▼"}
             </span>
           </button>
 
           {aktiverSchritt === "teams" && (
-            <div className="border-t border-gray-100 p-4">
+            <div className="border-t border-gray-700 p-4">
               <form onSubmit={handleTeamsSpeichern} className="flex flex-col gap-4">
                 {teilnahmen.map((teilnahme) => {
                   const assignedTeam = teams[teilnahme.id] ?? null;
@@ -488,10 +481,10 @@ export default function SpielBearbeitenFormular({
                   return (
                     <div
                       key={teilnahme.id}
-                      className="rounded-xl border border-gray-100 bg-gray-50 p-3"
+                      className="rounded-xl border border-gray-700 bg-gray-800/50 p-3"
                     >
                       <div className="flex items-center justify-between gap-3 flex-wrap">
-                        <span className="text-sm font-semibold text-gray-800">
+                        <span className="text-sm font-semibold text-gray-100">
                           {teilnahme.spielerName}
                         </span>
                         <div className="flex gap-2">
@@ -503,7 +496,7 @@ export default function SpielBearbeitenFormular({
                               className={`min-w-[60px] rounded-lg border px-3 py-1.5 text-sm font-semibold transition-colors ${
                                 assignedTeam === team
                                   ? TEAM_STYLES[team].active
-                                  : `bg-white ${TEAM_STYLES[team].button}`
+                                  : `bg-gray-800 ${TEAM_STYLES[team].button}`
                               }`}
                             >
                               {team}
@@ -513,8 +506,8 @@ export default function SpielBearbeitenFormular({
                       </div>
 
                       {assignedTeam && (
-                        <div className="mt-2 border-t border-gray-200 pt-2">
-                          <p className="text-xs text-gray-500 mb-1.5">
+                        <div className="mt-2 border-t border-gray-700 pt-2">
+                          <p className="text-xs text-gray-400 mb-1.5">
                             Punkte für:{" "}
                             <span className="italic">
                               {override ? override : `${assignedTeam} (Standard)`}
@@ -529,7 +522,7 @@ export default function SpielBearbeitenFormular({
                                 className={`min-w-[52px] rounded-md border px-2.5 py-1 text-xs font-medium transition-colors ${
                                   override === team
                                     ? TEAM_STYLES[team].active
-                                    : `bg-white ${TEAM_STYLES[team].button}`
+                                    : `bg-gray-800 ${TEAM_STYLES[team].button}`
                                 }`}
                               >
                                 {team}
@@ -541,7 +534,7 @@ export default function SpielBearbeitenFormular({
                                 onClick={() =>
                                   setOverrides((prev) => ({ ...prev, [teilnahme.id]: null }))
                                 }
-                                className="rounded-md border border-gray-200 px-2.5 py-1 text-xs text-gray-500 hover:bg-gray-50"
+                                className="rounded-md border border-gray-600 px-2.5 py-1 text-xs text-gray-400 hover:bg-gray-700 transition-colors"
                               >
                                 Reset
                               </button>
@@ -554,7 +547,7 @@ export default function SpielBearbeitenFormular({
                 })}
 
                 {teamsFehler && (
-                  <p role="alert" className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-600">
+                  <p role="alert" className="rounded-lg border border-red-700/60 bg-red-900/40 px-3 py-2 text-sm text-red-400">
                     {teamsFehler}
                   </p>
                 )}
@@ -563,14 +556,14 @@ export default function SpielBearbeitenFormular({
                   <button
                     type="button"
                     onClick={() => setAktiverSchritt(null)}
-                    className="flex-1 rounded-lg border border-gray-200 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+                    className="flex-1 rounded-lg border border-gray-600 px-4 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 transition-colors"
                   >
                     Abbrechen
                   </button>
                   <button
                     type="submit"
                     disabled={isPendingTeams}
-                    className="flex-1 rounded-lg bg-gray-800 px-4 py-2 text-sm font-semibold text-white hover:bg-gray-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="flex-1 rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white hover:bg-red-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {isPendingTeams ? "Speichern..." : "Speichern"}
                   </button>
@@ -581,26 +574,26 @@ export default function SpielBearbeitenFormular({
         </div>
 
         {/* ---- Tore ---- */}
-        <div className="rounded-xl border border-gray-100 bg-white shadow-sm overflow-hidden">
+        <div className="rounded-xl border border-gray-700 bg-gray-900/40 overflow-hidden">
           <button
             type="button"
             onClick={() =>
               setAktiverSchritt((prev) => (prev === "tore" ? null : "tore"))
             }
-            className="w-full flex items-center justify-between px-4 py-3 text-left hover:bg-gray-50 transition-colors"
+            className="w-full flex items-center justify-between px-4 py-3 text-left hover:bg-gray-700/30 transition-colors"
           >
-            <span className="text-sm font-semibold text-gray-800">
+            <span className="text-sm font-semibold text-gray-100">
               Tore bearbeiten ({tore.length})
             </span>
-            <span className="text-xs text-gray-400">
+            <span className="text-xs text-gray-500">
               {aktiverSchritt === "tore" ? "▲" : "▼"}
             </span>
           </button>
 
           {aktiverSchritt === "tore" && (
-            <div className="border-t border-gray-100 p-4 flex flex-col gap-5">
+            <div className="border-t border-gray-700 p-4 flex flex-col gap-5">
               {torFehler && (
-                <p role="alert" className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-600">
+                <p role="alert" className="rounded-lg border border-red-700/60 bg-red-900/40 px-3 py-2 text-sm text-red-400">
                   {torFehler}
                 </p>
               )}
@@ -615,24 +608,22 @@ export default function SpielBearbeitenFormular({
                     {tore.map((tor, idx) => (
                       <li key={tor.id}>
                         {bearbeitenTorId === tor.id ? (
-                          /* Edit form for this specific goal */
                           <form
                             onSubmit={handleTorBearbeitenSpeichern}
-                            className="rounded-lg border-2 border-blue-200 bg-blue-50 p-3 flex flex-col gap-3"
+                            className="rounded-lg border-2 border-blue-800/60 bg-blue-900/30 p-3 flex flex-col gap-3"
                           >
-                            <p className="text-xs font-semibold text-blue-700">
+                            <p className="text-xs font-semibold text-blue-300">
                               Tor {idx + 1} bearbeiten
                             </p>
 
-                            {/* Torschütze */}
                             <div>
-                              <label className="block text-xs font-medium text-gray-600 mb-1">
+                              <label className="block text-xs font-medium text-gray-300 mb-1">
                                 Torschütze *
                               </label>
                               <select
                                 value={editScorerId}
                                 onChange={(e) => handleEditScorerChange(e.target.value)}
-                                className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-gray-800 focus:border-gray-400 focus:outline-none"
+                                className="w-full rounded-lg border border-gray-600 bg-gray-900 px-3 py-2 text-sm text-gray-100 focus:border-gray-400 focus:outline-none"
                               >
                                 <option value="">— Spieler auswählen —</option>
                                 {(["Rot", "Gelb"] as Team[]).map((team) => (
@@ -649,16 +640,15 @@ export default function SpielBearbeitenFormular({
                               </select>
                             </div>
 
-                            {/* Vorlagengeber */}
                             <div>
-                              <label className="block text-xs font-medium text-gray-600 mb-1">
+                              <label className="block text-xs font-medium text-gray-300 mb-1">
                                 Vorlagengeber (optional)
                               </label>
                               <select
                                 value={editAssistId}
                                 onChange={(e) => setEditAssistId(e.target.value)}
                                 disabled={!editScorerId}
-                                className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-gray-800 focus:border-gray-400 focus:outline-none disabled:opacity-50"
+                                className="w-full rounded-lg border border-gray-600 bg-gray-900 px-3 py-2 text-sm text-gray-100 focus:border-gray-400 focus:outline-none disabled:opacity-50"
                               >
                                 <option value="">— kein Vorlagengeber —</option>
                                 {editMoeglicheAssists.map((t) => (
@@ -669,9 +659,8 @@ export default function SpielBearbeitenFormular({
                               </select>
                             </div>
 
-                            {/* Team */}
                             <div>
-                              <label className="block text-xs font-medium text-gray-600 mb-1">
+                              <label className="block text-xs font-medium text-gray-300 mb-1">
                                 Team *
                               </label>
                               <div className="flex gap-2">
@@ -683,7 +672,7 @@ export default function SpielBearbeitenFormular({
                                     className={`flex-1 rounded-lg border px-3 py-1.5 text-sm font-semibold transition-colors ${
                                       editTorTeam === team
                                         ? TEAM_BADGE[team]
-                                        : "border-gray-200 bg-white text-gray-600 hover:bg-gray-50"
+                                        : "border-gray-600 bg-gray-800 text-gray-300 hover:bg-gray-700"
                                     }`}
                                   >
                                     {team}
@@ -692,39 +681,37 @@ export default function SpielBearbeitenFormular({
                               </div>
                             </div>
 
-                            {/* Eigentor */}
                             <label className="flex items-center gap-3 cursor-pointer select-none">
                               <input
                                 type="checkbox"
                                 checked={editEigentor}
                                 onChange={(e) => setEditEigentor(e.target.checked)}
-                                className="h-4 w-4 rounded border-gray-300 accent-gray-800"
+                                className="h-4 w-4 rounded border-gray-600 accent-red-500"
                               />
-                              <span className="text-sm text-gray-700">Eigentor</span>
+                              <span className="text-sm text-gray-300">Eigentor</span>
                             </label>
 
                             <div className="flex gap-2">
                               <button
                                 type="button"
                                 onClick={() => setBearbeitenTorId(null)}
-                                className="flex-1 rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+                                className="flex-1 rounded-lg border border-gray-600 bg-gray-800 px-3 py-1.5 text-sm font-medium text-gray-300 hover:bg-gray-700 transition-colors"
                               >
                                 Abbrechen
                               </button>
                               <button
                                 type="submit"
                                 disabled={isPendingTor || !editScorerId || !editTorTeam}
-                                className="flex-1 rounded-lg bg-gray-800 px-3 py-1.5 text-sm font-semibold text-white hover:bg-gray-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                className="flex-1 rounded-lg bg-red-600 px-3 py-1.5 text-sm font-semibold text-white hover:bg-red-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                               >
                                 {isPendingTor ? "..." : "Speichern"}
                               </button>
                             </div>
                           </form>
                         ) : (
-                          /* Display row for this goal */
-                          <div className="flex items-center justify-between gap-3 rounded-lg border border-gray-100 bg-white px-3 py-2 shadow-sm">
+                          <div className="flex items-center justify-between gap-3 rounded-lg border border-gray-700 bg-gray-800/50 px-3 py-2">
                             <div className="flex items-center gap-2 flex-wrap">
-                              <span className="text-sm font-medium text-gray-400 w-5 text-right">
+                              <span className="text-sm font-medium text-gray-500 w-5 text-right">
                                 {idx + 1}.
                               </span>
                               <span
@@ -733,15 +720,15 @@ export default function SpielBearbeitenFormular({
                                 {tor.team}
                               </span>
                               {tor.eigentor && (
-                                <span className="rounded-full bg-orange-100 px-2 py-0.5 text-xs font-semibold text-orange-700 border border-orange-200">
+                                <span className="rounded-full bg-orange-900/40 px-2 py-0.5 text-xs font-semibold text-orange-400 border border-orange-700/40">
                                   ET
                                 </span>
                               )}
-                              <span className="text-sm text-gray-800 font-medium">
+                              <span className="text-sm text-gray-100 font-medium">
                                 {tor.scorer.name}
                               </span>
                               {tor.assist && (
-                                <span className="text-xs text-gray-400">
+                                <span className="text-xs text-gray-500">
                                   (Vorlage: {tor.assist.name})
                                 </span>
                               )}
@@ -751,7 +738,7 @@ export default function SpielBearbeitenFormular({
                                 type="button"
                                 onClick={() => handleTorBearbeitenOeffnen(tor)}
                                 disabled={isPendingTor}
-                                className="rounded-md border border-gray-200 px-2 py-1 text-xs text-gray-500 hover:border-blue-300 hover:text-blue-600 transition-colors disabled:opacity-40"
+                                className="rounded-md border border-gray-600 px-2 py-1 text-xs text-gray-400 hover:border-blue-700 hover:text-blue-400 transition-colors disabled:opacity-40"
                               >
                                 Bearbeiten
                               </button>
@@ -759,7 +746,7 @@ export default function SpielBearbeitenFormular({
                                 type="button"
                                 onClick={() => handleTorLoeschen(tor.id)}
                                 disabled={isPendingTor}
-                                className="rounded-md border border-gray-200 px-2 py-1 text-xs text-gray-400 hover:border-red-300 hover:text-red-500 transition-colors disabled:opacity-40"
+                                className="rounded-md border border-gray-600 px-2 py-1 text-xs text-gray-500 hover:border-red-700 hover:text-red-400 transition-colors disabled:opacity-40"
                               >
                                 Löschen
                               </button>
@@ -779,15 +766,14 @@ export default function SpielBearbeitenFormular({
                     Tor hinzufügen
                   </h3>
 
-                  {/* Torschütze */}
                   <div>
-                    <label className="block text-xs font-medium text-gray-600 mb-1">
+                    <label className="block text-xs font-medium text-gray-300 mb-1">
                       Torschütze *
                     </label>
                     <select
                       value={scorerId}
                       onChange={(e) => handleScorerChange(e.target.value)}
-                      className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-gray-800 focus:border-gray-400 focus:outline-none"
+                      className="w-full rounded-lg border border-gray-600 bg-gray-900 px-3 py-2 text-sm text-gray-100 focus:border-gray-400 focus:outline-none"
                     >
                       <option value="">— Spieler auswählen —</option>
                       {(["Rot", "Gelb"] as Team[]).map((team) => (
@@ -804,16 +790,15 @@ export default function SpielBearbeitenFormular({
                     </select>
                   </div>
 
-                  {/* Vorlagengeber */}
                   <div>
-                    <label className="block text-xs font-medium text-gray-600 mb-1">
+                    <label className="block text-xs font-medium text-gray-300 mb-1">
                       Vorlagengeber (optional)
                     </label>
                     <select
                       value={assistId}
                       onChange={(e) => setAssistId(e.target.value)}
                       disabled={!scorerId}
-                      className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-gray-800 focus:border-gray-400 focus:outline-none disabled:opacity-50"
+                      className="w-full rounded-lg border border-gray-600 bg-gray-900 px-3 py-2 text-sm text-gray-100 focus:border-gray-400 focus:outline-none disabled:opacity-50"
                     >
                       <option value="">— kein Vorlagengeber —</option>
                       {moeglicheAssists.map((t) => (
@@ -824,11 +809,10 @@ export default function SpielBearbeitenFormular({
                     </select>
                   </div>
 
-                  {/* Team */}
                   <div>
-                    <label className="block text-xs font-medium text-gray-600 mb-1">
+                    <label className="block text-xs font-medium text-gray-300 mb-1">
                       Team *{" "}
-                      <span className="text-gray-400 font-normal">
+                      <span className="text-gray-500 font-normal">
                         (bei Eigentor: Team des schießenden Spielers)
                       </span>
                     </label>
@@ -841,7 +825,7 @@ export default function SpielBearbeitenFormular({
                           className={`flex-1 rounded-lg border px-4 py-2 text-sm font-semibold transition-colors ${
                             torTeam === team
                               ? TEAM_BADGE[team]
-                              : "border-gray-200 bg-white text-gray-600 hover:bg-gray-50"
+                              : "border-gray-600 bg-gray-800 text-gray-300 hover:bg-gray-700"
                           }`}
                         >
                           {team}
@@ -850,24 +834,23 @@ export default function SpielBearbeitenFormular({
                     </div>
                   </div>
 
-                  {/* Eigentor */}
                   <label className="flex items-center gap-3 cursor-pointer select-none">
                     <input
                       type="checkbox"
                       checked={eigentor}
                       onChange={(e) => setEigentor(e.target.checked)}
-                      className="h-4 w-4 rounded border-gray-300 accent-gray-800"
+                      className="h-4 w-4 rounded border-gray-600 accent-red-500"
                     />
-                    <span className="text-sm text-gray-700">
+                    <span className="text-sm text-gray-300">
                       Eigentor{" "}
-                      <span className="text-xs text-gray-400">
+                      <span className="text-xs text-gray-500">
                         (zählt für das gegnerische Team)
                       </span>
                     </span>
                   </label>
 
                   {eigentor && torTeam && (
-                    <p className="rounded-lg border border-orange-200 bg-orange-50 px-3 py-2 text-xs text-orange-700">
+                    <p className="rounded-lg border border-orange-700/60 bg-orange-900/30 px-3 py-2 text-xs text-orange-400">
                       Eigentor: Das Tor wird{" "}
                       <strong>{torTeam === "Rot" ? "Gelb" : "Rot"}</strong> gutgeschrieben.
                     </p>
@@ -876,7 +859,7 @@ export default function SpielBearbeitenFormular({
                   <button
                     type="submit"
                     disabled={isPendingTor || !scorerId || !torTeam}
-                    className="w-full rounded-lg bg-gray-800 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-gray-700 disabled:cursor-not-allowed disabled:opacity-50"
+                    className="w-full rounded-lg bg-red-600 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-red-500 disabled:cursor-not-allowed disabled:opacity-50"
                   >
                     {isPendingTor ? "Speichern..." : "Tor hinzufügen"}
                   </button>

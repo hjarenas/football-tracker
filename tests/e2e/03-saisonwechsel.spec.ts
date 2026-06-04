@@ -108,11 +108,11 @@ test("Page heading updates when season changes via URL", async ({ page }) => {
   await page.goto("/?saison=2025");
   await page.waitForLoadState("networkidle");
 
-  // The season heading should reflect 2025
-  await expect(page.locator("h2").first()).toContainText("2025");
+  // The season heading (h1) should reflect 2025
+  await expect(page.locator("h1")).toContainText("2025");
 
   await page.goto("/?saison=2026");
   await page.waitForLoadState("networkidle");
 
-  await expect(page.locator("h2").first()).toContainText("2026");
+  await expect(page.locator("h1")).toContainText("2026");
 });

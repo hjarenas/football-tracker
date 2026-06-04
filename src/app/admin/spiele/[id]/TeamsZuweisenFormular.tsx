@@ -19,17 +19,16 @@ interface Props {
 
 const TEAM_STYLES: Record<Team, { button: string; active: string }> = {
   Rot: {
-    button: "border-red-300 text-red-700 hover:bg-red-50",
+    button: "border-red-700/60 text-red-400 hover:bg-red-900/20",
     active: "bg-red-600 text-white border-red-600",
   },
   Gelb: {
-    button: "border-yellow-400 text-yellow-700 hover:bg-yellow-50",
+    button: "border-yellow-700/60 text-yellow-400 hover:bg-yellow-900/20",
     active: "bg-yellow-400 text-yellow-900 border-yellow-400",
   },
 };
 
 export default function TeamsZuweisenFormular({ spielId, teilnahmen }: Props) {
-  // team assignments: teilnahmeId → Team
   const [teams, setTeams] = useState<Record<string, Team>>(() => {
     const initial: Record<string, Team> = {};
     for (const t of teilnahmen) {
@@ -38,7 +37,6 @@ export default function TeamsZuweisenFormular({ spielId, teilnahmen }: Props) {
     return initial;
   });
 
-  // punkteOverride: teilnahmeId → Team | null
   const [overrides, setOverrides] = useState<Record<string, Team | null>>(() => {
     const initial: Record<string, Team | null> = {};
     for (const t of teilnahmen) {
@@ -96,13 +94,13 @@ export default function TeamsZuweisenFormular({ spielId, teilnahmen }: Props) {
     <form onSubmit={handleSubmit} className="flex flex-col gap-6">
       {/* Team-Übersicht */}
       <div className="flex gap-3">
-        <div className="flex-1 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-center">
-          <span className="block text-2xl font-bold text-red-600">{rotAnzahl}</span>
-          <span className="text-xs font-medium text-red-700">Rot</span>
+        <div className="flex-1 rounded-lg border border-red-800/60 bg-red-900/30 px-4 py-3 text-center">
+          <span className="block text-2xl font-bold text-red-400">{rotAnzahl}</span>
+          <span className="text-xs font-medium text-red-400">Rot</span>
         </div>
-        <div className="flex-1 rounded-lg border border-yellow-200 bg-yellow-50 px-4 py-3 text-center">
-          <span className="block text-2xl font-bold text-yellow-600">{gelbAnzahl}</span>
-          <span className="text-xs font-medium text-yellow-700">Gelb</span>
+        <div className="flex-1 rounded-lg border border-yellow-800/60 bg-yellow-900/30 px-4 py-3 text-center">
+          <span className="block text-2xl font-bold text-yellow-400">{gelbAnzahl}</span>
+          <span className="text-xs font-medium text-yellow-400">Gelb</span>
         </div>
       </div>
 
@@ -115,10 +113,10 @@ export default function TeamsZuweisenFormular({ spielId, teilnahmen }: Props) {
           return (
             <div
               key={teilnahme.id}
-              className="rounded-xl border border-gray-100 bg-white p-4 shadow-sm"
+              className="rounded-xl border border-gray-700 bg-gray-900/40 p-4"
             >
               <div className="flex items-center justify-between gap-3 flex-wrap">
-                <span className="text-sm font-semibold text-gray-800">
+                <span className="text-sm font-semibold text-gray-100">
                   {teilnahme.spielerName}
                 </span>
 
@@ -132,7 +130,7 @@ export default function TeamsZuweisenFormular({ spielId, teilnahmen }: Props) {
                       className={`min-w-[60px] rounded-lg border px-4 py-1.5 text-sm font-semibold transition-colors ${
                         assignedTeam === team
                           ? TEAM_STYLES[team].active
-                          : `bg-white ${TEAM_STYLES[team].button}`
+                          : `bg-gray-800 ${TEAM_STYLES[team].button}`
                       }`}
                     >
                       {team}
@@ -143,8 +141,8 @@ export default function TeamsZuweisenFormular({ spielId, teilnahmen }: Props) {
 
               {/* Punkte-Override — nur anzeigen wenn Team zugewiesen */}
               {assignedTeam && (
-                <div className="mt-3 border-t border-gray-100 pt-3">
-                  <p className="text-xs text-gray-500 mb-2">
+                <div className="mt-3 border-t border-gray-700 pt-3">
+                  <p className="text-xs text-gray-400 mb-2">
                     Punkte für:{" "}
                     <span className="italic">
                       {override
@@ -161,7 +159,7 @@ export default function TeamsZuweisenFormular({ spielId, teilnahmen }: Props) {
                         className={`min-w-[60px] rounded-md border px-3 py-1 text-xs font-medium transition-colors ${
                           override === team
                             ? TEAM_STYLES[team].active
-                            : `bg-white ${TEAM_STYLES[team].button}`
+                            : `bg-gray-800 ${TEAM_STYLES[team].button}`
                         }`}
                       >
                         {team}
@@ -176,7 +174,7 @@ export default function TeamsZuweisenFormular({ spielId, teilnahmen }: Props) {
                             [teilnahme.id]: null,
                           }))
                         }
-                        className="rounded-md border border-gray-200 px-3 py-1 text-xs text-gray-500 hover:bg-gray-50"
+                        className="rounded-md border border-gray-600 px-3 py-1 text-xs text-gray-400 hover:bg-gray-700 transition-colors"
                       >
                         Zurücksetzen
                       </button>
@@ -192,14 +190,14 @@ export default function TeamsZuweisenFormular({ spielId, teilnahmen }: Props) {
       {fehler && (
         <p
           role="alert"
-          className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-600"
+          className="rounded-lg border border-red-700/60 bg-red-900/40 px-3 py-2 text-sm text-red-400"
         >
           {fehler}
         </p>
       )}
 
       {!alleZugewiesen && (
-        <p className="text-xs text-amber-600 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2">
+        <p className="text-xs text-amber-400 bg-amber-900/30 border border-amber-700/60 rounded-lg px-3 py-2">
           {teilnahmen.length - Object.keys(teams).length} Spieler noch nicht zugewiesen.
         </p>
       )}
@@ -207,7 +205,7 @@ export default function TeamsZuweisenFormular({ spielId, teilnahmen }: Props) {
       <button
         type="submit"
         disabled={isPending || !alleZugewiesen}
-        className="w-full rounded-lg bg-gray-800 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-gray-700 disabled:cursor-not-allowed disabled:opacity-50"
+        className="w-full rounded-lg bg-red-600 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-red-500 disabled:cursor-not-allowed disabled:opacity-50"
       >
         {isPending ? "Speichern..." : "Teams speichern"}
       </button>

@@ -1,5 +1,4 @@
 import { prisma } from "@/lib/prisma";
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import TeamsZuweisenFormular from "./TeamsZuweisenFormular";
 import SpielberichtFormular from "./SpielberichtFormular";
@@ -15,10 +14,10 @@ const STATUS_LABELS: Record<string, string> = {
 };
 
 const STATUS_COLORS: Record<string, string> = {
-  geplant: "bg-blue-100 text-blue-800",
-  teams_zugewiesen: "bg-yellow-100 text-yellow-800",
-  abgeschlossen: "bg-green-100 text-green-800",
-  abgesagt: "bg-gray-100 text-gray-500 line-through",
+  geplant: "bg-blue-900/60 text-blue-300",
+  teams_zugewiesen: "bg-yellow-900/60 text-yellow-300",
+  abgeschlossen: "bg-green-900/60 text-green-300",
+  abgesagt: "bg-gray-700 text-gray-400 line-through",
 };
 
 function formatDatum(datum: Date): string {
@@ -82,7 +81,6 @@ export default async function SpielDetailPage({ params }: Props) {
     punkteOverride: t.punkteOverride as "Rot" | "Gelb" | null,
   }));
 
-  // Teilnehmer with assigned teams (for goal entry form)
   const teilnehmerMitTeam = spiel.teilnahmen
     .filter((t) => t.team !== null)
     .map((t) => ({
@@ -91,7 +89,6 @@ export default async function SpielDetailPage({ params }: Props) {
       team: t.team as "Rot" | "Gelb",
     }));
 
-  // Tore for goal entry form
   const toreFuerFormular = spiel.tore.map((t) => ({
     id: t.id,
     team: t.team as "Rot" | "Gelb",
@@ -100,12 +97,10 @@ export default async function SpielDetailPage({ params }: Props) {
     assist: t.assist ? { id: t.assist.id, name: t.assist.name } : null,
   }));
 
-  // Derived score (for abgeschlossen view)
   const ergebnis = deriveScore(
     spiel.tore.map((t) => ({ team: t.team as "Rot" | "Gelb", eigentor: t.eigentor }))
   );
 
-  // Teilnahmen for the edit formular
   const teilnahmenFuerBearbeiten = spiel.teilnahmen.map((t) => ({
     id: t.id,
     spielerId: t.spieler.id,
@@ -115,45 +110,36 @@ export default async function SpielDetailPage({ params }: Props) {
   }));
 
   return (
-    <main className="min-h-screen bg-gray-50 p-4">
-      <div className="w-full max-w-lg mx-auto">
-        <div className="mb-4">
-          <Link
-            href="/admin/spiele"
-            className="text-sm text-gray-500 hover:text-gray-700"
-          >
-            ← Zurück zur Spielübersicht
-          </Link>
-        </div>
-
+    <main className="min-h-screen pb-12">
+      <div className="w-full max-w-lg mx-auto px-4 pt-6 flex flex-col gap-4">
         {/* Spiel-Header */}
-        <div className="bg-white rounded-xl shadow-md p-6 mb-4">
+        <div className="bg-gray-800 rounded-xl border border-gray-700 p-6">
           <div className="flex items-start justify-between gap-2 mb-3">
             <div>
-              <h1 className="text-xl font-bold text-gray-800">
+              <h1 className="text-xl font-bold text-gray-100">
                 {formatDatum(spiel.datum)}
               </h1>
-              <p className="text-xs text-gray-400 mt-0.5">
+              <p className="text-xs text-gray-500 mt-0.5">
                 Saison {spiel.saison.jahr}
               </p>
             </div>
             <span
               className={`text-xs font-medium px-2 py-1 rounded-full whitespace-nowrap ${
-                STATUS_COLORS[spiel.status] ?? "bg-gray-100 text-gray-600"
+                STATUS_COLORS[spiel.status] ?? "bg-gray-700 text-gray-400"
               }`}
             >
               {STATUS_LABELS[spiel.status] ?? spiel.status}
             </span>
           </div>
 
-          <div className="flex flex-wrap gap-4 text-sm text-gray-600">
+          <div className="flex flex-wrap gap-4 text-sm text-gray-400">
             <span>
-              <span className="font-medium">Teilnehmer:</span>{" "}
+              <span className="font-medium text-gray-300">Teilnehmer:</span>{" "}
               {spiel.teilnahmen.length}
             </span>
             {spiel.bierbringer && (
               <span>
-                <span className="font-medium">Bierbringer:</span>{" "}
+                <span className="font-medium text-gray-300">Bierbringer:</span>{" "}
                 {spiel.bierbringer.name}
               </span>
             )}
@@ -162,11 +148,11 @@ export default async function SpielDetailPage({ params }: Props) {
 
         {/* Teams zuweisen — nur bei Status geplant */}
         {kannTeamsZuweisen && (
-          <div className="bg-white rounded-xl shadow-md p-6">
-            <h2 className="text-lg font-bold text-gray-800 mb-1">
+          <div className="bg-gray-800 rounded-xl border border-gray-700 p-6">
+            <h2 className="text-lg font-bold text-gray-100 mb-1">
               Teams zuweisen
             </h2>
-            <p className="text-sm text-gray-500 mb-5">
+            <p className="text-sm text-gray-400 mb-5">
               Jeden Spieler Rot oder Gelb zuweisen.
             </p>
             <TeamsZuweisenFormular
@@ -179,11 +165,11 @@ export default async function SpielDetailPage({ params }: Props) {
 
         {/* Spielbericht erfassen — bei Status teams_zugewiesen */}
         {teamsZugewiesen && (
-          <div className="bg-white rounded-xl shadow-md p-6">
-            <h2 className="text-lg font-bold text-gray-800 mb-1">
+          <div className="bg-gray-800 rounded-xl border border-gray-700 p-6">
+            <h2 className="text-lg font-bold text-gray-100 mb-1">
               Spielbericht erfassen
             </h2>
-            <p className="text-sm text-gray-500 mb-5">
+            <p className="text-sm text-gray-400 mb-5">
               Tore eintragen und Spiel abschließen.
             </p>
             <SpielberichtFormular
@@ -198,25 +184,25 @@ export default async function SpielDetailPage({ params }: Props) {
         {abgeschlossen && (
           <>
             {/* Read-only summary card */}
-            <div className="bg-white rounded-xl shadow-md p-6 mb-4">
-              <h2 className="text-lg font-bold text-gray-800 mb-4">Ergebnis</h2>
+            <div className="bg-gray-800 rounded-xl border border-gray-700 p-6">
+              <h2 className="text-lg font-bold text-gray-100 mb-4">Ergebnis</h2>
 
               {/* Score display */}
               <div className="flex items-center gap-4 mb-6">
-                <div className="flex-1 rounded-xl border-2 border-red-200 bg-red-50 py-4 text-center">
-                  <span className="block text-4xl font-bold text-red-600">
+                <div className="flex-1 rounded-xl border-2 border-red-800/60 bg-red-900/30 py-4 text-center">
+                  <span className="block text-4xl font-bold text-red-400">
                     {ergebnis.rot}
                   </span>
-                  <span className="text-xs font-semibold uppercase tracking-wide text-red-700 mt-1 block">
+                  <span className="text-xs font-semibold uppercase tracking-wide text-red-400 mt-1 block">
                     Rot
                   </span>
                 </div>
-                <span className="text-2xl font-bold text-gray-400">:</span>
-                <div className="flex-1 rounded-xl border-2 border-yellow-300 bg-yellow-50 py-4 text-center">
-                  <span className="block text-4xl font-bold text-yellow-600">
+                <span className="text-2xl font-bold text-gray-500">:</span>
+                <div className="flex-1 rounded-xl border-2 border-yellow-800/60 bg-yellow-900/30 py-4 text-center">
+                  <span className="block text-4xl font-bold text-yellow-400">
                     {ergebnis.gelb}
                   </span>
-                  <span className="text-xs font-semibold uppercase tracking-wide text-yellow-700 mt-1 block">
+                  <span className="text-xs font-semibold uppercase tracking-wide text-yellow-400 mt-1 block">
                     Gelb
                   </span>
                 </div>
@@ -225,17 +211,17 @@ export default async function SpielDetailPage({ params }: Props) {
               {/* Teams */}
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <h3 className="text-sm font-bold text-red-700 mb-2 uppercase tracking-wide">
+                  <h3 className="text-sm font-bold text-red-400 mb-2 uppercase tracking-wide">
                     Rot ({spiel.teilnahmen.filter((t) => t.team === "Rot").length})
                   </h3>
                   <ul className="flex flex-col gap-1">
                     {spiel.teilnahmen
                       .filter((t) => t.team === "Rot")
                       .map((t) => (
-                        <li key={t.id} className="text-sm text-gray-700">
+                        <li key={t.id} className="text-sm text-gray-300">
                           {t.spieler.name}
                           {t.punkteOverride && t.punkteOverride !== t.team && (
-                            <span className="ml-1 text-xs text-gray-400">
+                            <span className="ml-1 text-xs text-gray-500">
                               (Punkte: {t.punkteOverride})
                             </span>
                           )}
@@ -244,17 +230,17 @@ export default async function SpielDetailPage({ params }: Props) {
                   </ul>
                 </div>
                 <div>
-                  <h3 className="text-sm font-bold text-yellow-700 mb-2 uppercase tracking-wide">
+                  <h3 className="text-sm font-bold text-yellow-400 mb-2 uppercase tracking-wide">
                     Gelb ({spiel.teilnahmen.filter((t) => t.team === "Gelb").length})
                   </h3>
                   <ul className="flex flex-col gap-1">
                     {spiel.teilnahmen
                       .filter((t) => t.team === "Gelb")
                       .map((t) => (
-                        <li key={t.id} className="text-sm text-gray-700">
+                        <li key={t.id} className="text-sm text-gray-300">
                           {t.spieler.name}
                           {t.punkteOverride && t.punkteOverride !== t.team && (
-                            <span className="ml-1 text-xs text-gray-400">
+                            <span className="ml-1 text-xs text-gray-500">
                               (Punkte: {t.punkteOverride})
                             </span>
                           )}
@@ -266,14 +252,14 @@ export default async function SpielDetailPage({ params }: Props) {
 
               {/* Torliste */}
               {spiel.tore.length > 0 && (
-                <div className="mt-5 border-t border-gray-100 pt-4">
-                  <h3 className="text-sm font-semibold text-gray-600 mb-2">
+                <div className="mt-5 border-t border-gray-700 pt-4">
+                  <h3 className="text-sm font-semibold text-gray-400 mb-2">
                     Tore ({spiel.tore.length})
                   </h3>
                   <ul className="flex flex-col gap-1.5">
                     {spiel.tore.map((tor, idx) => (
-                      <li key={tor.id} className="flex items-center gap-2 text-sm text-gray-700">
-                        <span className="text-gray-400 w-5 text-right">{idx + 1}.</span>
+                      <li key={tor.id} className="flex items-center gap-2 text-sm text-gray-300">
+                        <span className="text-gray-500 w-5 text-right">{idx + 1}.</span>
                         <span
                           className={`rounded-full px-2 py-0.5 text-xs font-semibold ${
                             tor.team === "Rot"
@@ -284,13 +270,13 @@ export default async function SpielDetailPage({ params }: Props) {
                           {tor.team}
                         </span>
                         {tor.eigentor && (
-                          <span className="rounded-full bg-orange-100 px-2 py-0.5 text-xs font-semibold text-orange-700 border border-orange-200">
+                          <span className="rounded-full bg-orange-900/40 px-2 py-0.5 text-xs font-semibold text-orange-400 border border-orange-700/40">
                             ET
                           </span>
                         )}
                         <span>{tor.scorer.name}</span>
                         {tor.assist && (
-                          <span className="text-xs text-gray-400">
+                          <span className="text-xs text-gray-500">
                             (Vorlage: {tor.assist.name})
                           </span>
                         )}
@@ -302,11 +288,11 @@ export default async function SpielDetailPage({ params }: Props) {
             </div>
 
             {/* Edit section */}
-            <div className="bg-white rounded-xl shadow-md p-6">
-              <h2 className="text-lg font-bold text-gray-800 mb-1">
+            <div className="bg-gray-800 rounded-xl border border-gray-700 p-6">
+              <h2 className="text-lg font-bold text-gray-100 mb-1">
                 Spiel bearbeiten
               </h2>
-              <p className="text-sm text-gray-500 mb-5">
+              <p className="text-sm text-gray-400 mb-5">
                 Fehler korrigieren — Status bleibt abgeschlossen.
               </p>
               <SpielBearbeitenFormular
@@ -323,8 +309,8 @@ export default async function SpielDetailPage({ params }: Props) {
 
         {/* Abgesagt */}
         {spiel.status === "abgesagt" && (
-          <div className="bg-white rounded-xl shadow-md p-6">
-            <p className="text-gray-500 text-sm">Dieses Spiel wurde abgesagt.</p>
+          <div className="bg-gray-800 rounded-xl border border-gray-700 p-6">
+            <p className="text-gray-400 text-sm">Dieses Spiel wurde abgesagt.</p>
           </div>
         )}
       </div>

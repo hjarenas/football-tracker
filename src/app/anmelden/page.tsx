@@ -44,7 +44,7 @@ function AnmeldenForm() {
       <div>
         <label
           htmlFor="username"
-          className="block text-sm font-medium text-gray-700 mb-1"
+          className="block text-sm font-medium text-gray-300 mb-1"
         >
           Benutzername
         </label>
@@ -55,7 +55,7 @@ function AnmeldenForm() {
           required
           value={username}
           onChange={(e) => setUsername(e.target.value)}
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-gray-800"
+          className="w-full px-3 py-2 bg-gray-900 border border-gray-600 rounded-lg text-sm text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
           placeholder="Benutzername eingeben"
         />
       </div>
@@ -63,7 +63,7 @@ function AnmeldenForm() {
       <div>
         <label
           htmlFor="password"
-          className="block text-sm font-medium text-gray-700 mb-1"
+          className="block text-sm font-medium text-gray-300 mb-1"
         >
           Passwort
         </label>
@@ -74,7 +74,7 @@ function AnmeldenForm() {
           required
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-gray-800"
+          className="w-full px-3 py-2 bg-gray-900 border border-gray-600 rounded-lg text-sm text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
           placeholder="Passwort eingeben"
         />
       </div>
@@ -82,7 +82,7 @@ function AnmeldenForm() {
       {fehler && (
         <p
           role="alert"
-          className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-3 py-2"
+          className="text-sm text-red-400 bg-red-900/40 border border-red-700/60 rounded-lg px-3 py-2"
         >
           {fehler}
         </p>
@@ -91,7 +91,7 @@ function AnmeldenForm() {
       <button
         type="submit"
         disabled={ladend}
-        className="w-full py-2 px-4 bg-gray-800 text-white font-semibold rounded-lg hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+        className="w-full py-2 px-4 bg-red-600 hover:bg-red-500 text-white font-semibold rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
       >
         {ladend ? "Anmelden..." : "Anmelden"}
       </button>
@@ -101,9 +101,9 @@ function AnmeldenForm() {
 
 export default function AnmeldenPage() {
   return (
-    <main className="min-h-screen flex flex-col items-center justify-center p-4 bg-gray-50">
-      <div className="w-full max-w-sm bg-white rounded-xl shadow-md p-8">
-        <h1 className="text-2xl font-bold mb-2 text-center text-gray-800">
+    <main className="min-h-screen flex flex-col items-center justify-center p-4">
+      <div className="w-full max-w-sm bg-gray-800 rounded-xl border border-gray-700 p-8">
+        <h1 className="text-xl font-bold mb-1 text-center text-gray-100">
           Anmelden
         </h1>
         <p className="text-sm text-gray-500 text-center mb-6">

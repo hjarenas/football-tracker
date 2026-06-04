@@ -26,11 +26,11 @@ export default function SpielAbsagenFormular({ spielId }: Props) {
 
   if (!bestaetigung) {
     return (
-      <div className="border-t border-gray-100 pt-4">
+      <div className="border-t border-gray-700 pt-4 mt-4">
         <button
           type="button"
           onClick={() => setBestaetigung(true)}
-          className="w-full rounded-lg border-2 border-red-500 px-4 py-2.5 text-sm font-semibold text-red-600 transition-colors hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-50"
+          className="w-full rounded-lg border-2 border-red-700/60 px-4 py-2.5 text-sm font-semibold text-red-400 transition-colors hover:bg-red-900/20 disabled:cursor-not-allowed disabled:opacity-50"
         >
           Spiel absagen
         </button>
@@ -39,12 +39,12 @@ export default function SpielAbsagenFormular({ spielId }: Props) {
   }
 
   return (
-    <div className="border-t border-gray-100 pt-4">
-      <div className="rounded-xl border-2 border-red-200 bg-red-50 p-4">
-        <p className="text-sm font-semibold text-red-700 mb-1">
+    <div className="border-t border-gray-700 pt-4 mt-4">
+      <div className="rounded-xl border-2 border-red-800/60 bg-red-900/30 p-4">
+        <p className="text-sm font-semibold text-red-400 mb-1">
           Spiel wirklich absagen?
         </p>
-        <p className="text-xs text-red-600 mb-4">
+        <p className="text-xs text-red-400/80 mb-4">
           Diese Aktion kann nicht rückgängig gemacht werden. Das Spiel wird als
           <strong> Abgesagt</strong> markiert und in der Spielhistorie angezeigt.
         </p>
@@ -52,7 +52,7 @@ export default function SpielAbsagenFormular({ spielId }: Props) {
         {fehler && (
           <p
             role="alert"
-            className="mb-3 rounded-lg border border-red-300 bg-red-100 px-3 py-2 text-sm text-red-700"
+            className="mb-3 rounded-lg border border-red-700/60 bg-red-900/40 px-3 py-2 text-sm text-red-400"
           >
             {fehler}
           </p>
@@ -63,7 +63,7 @@ export default function SpielAbsagenFormular({ spielId }: Props) {
             type="button"
             onClick={() => setBestaetigung(false)}
             disabled={isPending}
-            className="flex-1 rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors disabled:opacity-50"
+            className="flex-1 rounded-lg border border-gray-600 bg-gray-700 px-4 py-2 text-sm font-medium text-gray-300 hover:bg-gray-600 transition-colors disabled:opacity-50"
           >
             Abbrechen
           </button>

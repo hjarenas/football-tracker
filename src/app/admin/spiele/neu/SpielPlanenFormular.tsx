@@ -33,8 +33,6 @@ export default function SpielPlanenFormular({
   const [fehler, setFehler] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
 
-  // Merge server-provided list with client-side newly created players,
-  // deduplicating by id so that revalidatePath re-renders don't produce duplicate keys.
   const spielerIds = new Set(spieler.map((s) => s.id));
   const alleSpieler = [...spieler, ...extraSpieler.filter((s) => !spielerIds.has(s.id))];
 
@@ -113,9 +111,9 @@ export default function SpielPlanenFormular({
       <div>
         <label
           htmlFor="datum"
-          className="block text-sm font-medium text-gray-700 mb-1"
+          className="block text-sm font-medium text-gray-300 mb-1"
         >
-          Datum <span className="text-red-500">*</span>
+          Datum <span className="text-red-400">*</span>
         </label>
         <input
           id="datum"
@@ -123,34 +121,34 @@ export default function SpielPlanenFormular({
           required
           value={datum}
           onChange={(e) => setDatum(e.target.value)}
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-gray-800"
+          className="w-full px-3 py-2 bg-gray-900 border border-gray-600 rounded-lg text-sm text-gray-100 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
         />
       </div>
 
       {/* Bierbringer */}
       <div className="relative">
-        <label className="block text-sm font-medium text-gray-700 mb-1">
+        <label className="block text-sm font-medium text-gray-300 mb-1">
           Bierbringer
         </label>
         <button
           type="button"
           onClick={() => setBierbringerOffen((v) => !v)}
-          className="w-full text-left px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-gray-800 bg-white"
+          className="w-full text-left px-3 py-2 bg-gray-900 border border-gray-600 rounded-lg text-sm text-gray-100 focus:outline-none focus:ring-2 focus:ring-red-500"
         >
           {ausgewaehlterBierbringer
             ? ausgewaehlterBierbringer.name
-            : "Bierbringer auswählen..."}
+            : <span className="text-gray-500">Bierbringer auswählen...</span>}
         </button>
 
         {bierbringerOffen && (
-          <div className="absolute z-10 mt-1 w-full bg-white border border-gray-200 rounded-lg shadow-lg">
+          <div className="absolute z-10 mt-1 w-full bg-gray-800 border border-gray-600 rounded-lg shadow-lg">
             <div className="p-2">
               <input
                 type="text"
                 placeholder="Suchen..."
                 value={bierbringerSuche}
                 onChange={(e) => setBierbringerSuche(e.target.value)}
-                className="w-full px-3 py-1.5 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-gray-800"
+                className="w-full px-3 py-1.5 bg-gray-900 border border-gray-600 rounded-md text-sm text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-red-500"
                 autoFocus
               />
             </div>
@@ -163,7 +161,7 @@ export default function SpielPlanenFormular({
                     setBierbringerSuche("");
                     setBierbringerOffen(false);
                   }}
-                  className="w-full text-left px-4 py-2 text-sm text-gray-500 hover:bg-gray-50 italic"
+                  className="w-full text-left px-4 py-2 text-sm text-gray-400 hover:bg-gray-700 italic"
                 >
                   — Keiner —
                 </button>
@@ -177,10 +175,10 @@ export default function SpielPlanenFormular({
                       setBierbringerSuche("");
                       setBierbringerOffen(false);
                     }}
-                    className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-50 ${
+                    className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-700 ${
                       bierbringerId === s.id
-                        ? "font-semibold text-gray-900 bg-gray-100"
-                        : "text-gray-700"
+                        ? "font-semibold text-gray-100 bg-gray-700"
+                        : "text-gray-300"
                     }`}
                   >
                     {s.name}
@@ -188,7 +186,7 @@ export default function SpielPlanenFormular({
                 </li>
               ))}
               {gefilterteBierbringer.length === 0 && (
-                <li className="px-4 py-2 text-sm text-gray-400 italic">
+                <li className="px-4 py-2 text-sm text-gray-500 italic">
                   Keine Treffer
                 </li>
               )}
@@ -200,9 +198,9 @@ export default function SpielPlanenFormular({
       {/* Teilnehmer */}
       <div>
         <div className="flex items-center justify-between mb-1">
-          <label className="block text-sm font-medium text-gray-700">
-            Teilnehmer <span className="text-red-500">*</span>{" "}
-            <span className="text-gray-400 font-normal">
+          <label className="block text-sm font-medium text-gray-300">
+            Teilnehmer <span className="text-red-400">*</span>{" "}
+            <span className="text-gray-500 font-normal">
               ({ausgewaehlteTeilnehmer.size} ausgewählt)
             </span>
           </label>
@@ -210,15 +208,15 @@ export default function SpielPlanenFormular({
             <button
               type="button"
               onClick={alleAuswaehlen}
-              className="text-blue-600 hover:underline"
+              className="text-blue-400 hover:underline"
             >
               Alle
             </button>
-            <span className="text-gray-300">|</span>
+            <span className="text-gray-600">|</span>
             <button
               type="button"
               onClick={alleAbwaehlen}
-              className="text-gray-500 hover:underline"
+              className="text-gray-400 hover:underline"
             >
               Keine
             </button>
@@ -230,7 +228,7 @@ export default function SpielPlanenFormular({
           placeholder="Spieler suchen..."
           value={teilnehmerSuche}
           onChange={(e) => setTeilnehmerSuche(e.target.value)}
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-gray-800 mb-2"
+          className="w-full px-3 py-2 bg-gray-900 border border-gray-600 rounded-lg text-sm text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-red-500 mb-2"
         />
 
         {/* Inline new player creation */}
@@ -246,43 +244,43 @@ export default function SpielPlanenFormular({
                 handleNeuerSpieler();
               }
             }}
-            className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-gray-800"
+            className="flex-1 px-3 py-2 bg-gray-900 border border-gray-600 rounded-lg text-sm text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-red-500"
           />
           <button
             type="button"
             onClick={handleNeuerSpieler}
             disabled={isCreating || !neuerSpielerName.trim()}
-            className="px-3 py-2 bg-gray-100 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            className="px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-sm font-medium text-gray-300 hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
             {isCreating ? "..." : "Hinzufügen"}
           </button>
         </div>
         {neuerSpielerFehler && (
-          <p className="text-xs text-red-600 mb-2">{neuerSpielerFehler}</p>
+          <p className="text-xs text-red-400 mb-2">{neuerSpielerFehler}</p>
         )}
 
-        <div className="border border-gray-200 rounded-lg max-h-64 overflow-y-auto divide-y divide-gray-100">
+        <div className="border border-gray-600 rounded-lg max-h-64 overflow-y-auto divide-y divide-gray-700">
           {gefilterteTeilnehmer.map((s) => {
             const checked = ausgewaehlteTeilnehmer.has(s.id);
             return (
               <label
                 key={s.id}
-                className={`flex items-center gap-3 px-4 py-2.5 cursor-pointer hover:bg-gray-50 ${
-                  checked ? "bg-blue-50" : ""
+                className={`flex items-center gap-3 px-4 py-2.5 cursor-pointer transition-colors ${
+                  checked ? "bg-blue-900/30 hover:bg-blue-900/40" : "hover:bg-gray-700/40"
                 }`}
               >
                 <input
                   type="checkbox"
                   checked={checked}
                   onChange={() => toggleTeilnehmer(s.id)}
-                  className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                  className="h-4 w-4 rounded border-gray-600 text-blue-600 focus:ring-blue-500"
                 />
-                <span className="text-sm text-gray-700">{s.name}</span>
+                <span className="text-sm text-gray-100">{s.name}</span>
               </label>
             );
           })}
           {gefilterteTeilnehmer.length === 0 && (
-            <p className="px-4 py-3 text-sm text-gray-400 italic">
+            <p className="px-4 py-3 text-sm text-gray-500 italic">
               Keine Spieler gefunden
             </p>
           )}
@@ -292,7 +290,7 @@ export default function SpielPlanenFormular({
       {fehler && (
         <p
           role="alert"
-          className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-3 py-2"
+          className="text-sm text-red-400 bg-red-900/40 border border-red-700/60 rounded-lg px-3 py-2"
         >
           {fehler}
         </p>
@@ -301,7 +299,7 @@ export default function SpielPlanenFormular({
       <button
         type="submit"
         disabled={isPending}
-        className="w-full py-2.5 px-4 bg-gray-800 text-white font-semibold rounded-lg hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+        className="w-full py-2.5 px-4 bg-red-600 text-white font-semibold rounded-lg hover:bg-red-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
       >
         {isPending ? "Speichern..." : "Spiel planen"}
       </button>

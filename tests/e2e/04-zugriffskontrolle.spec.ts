@@ -44,18 +44,17 @@ test("GET /admin/spiele without session redirects to /anmelden", async ({
 test("GET / is accessible without session", async ({ page }) => {
   await page.goto("/");
   await expect(page).toHaveURL("/");
-  await expect(page.locator("h1")).toContainText("Dienstagskicken");
+  await expect(page.locator("header")).toContainText("Dienstagskicken");
 });
 
 test("GET /spiele is accessible without session", async ({ page }) => {
   await page.goto("/spiele");
   await expect(page).toHaveURL("/spiele");
-  // The page title heading should be present
-  await expect(page.locator("h1")).toContainText("Spielübersicht");
+  await expect(page.locator("h1")).toContainText("Saison");
 });
 
 test("GET /ewige-tabelle is accessible without session", async ({ page }) => {
   await page.goto("/ewige-tabelle");
   await expect(page).toHaveURL("/ewige-tabelle");
-  await expect(page.locator("h1")).toContainText("Ewige Tabelle");
+  await expect(page.locator("h1")).toContainText("Alle Zeiten");
 });

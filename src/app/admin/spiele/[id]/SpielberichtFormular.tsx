@@ -7,7 +7,7 @@ import { deriveScore } from "@/lib/score";
 type Team = "Rot" | "Gelb";
 
 interface Teilnehmer {
-  id: string; // Spieler.id
+  id: string;
   name: string;
   team: Team;
 }
@@ -26,11 +26,6 @@ interface Props {
   initialTore: Tor[];
 }
 
-const TEAM_LABEL_STYLES: Record<Team, string> = {
-  Rot: "bg-red-100 text-red-700 border-red-200",
-  Gelb: "bg-yellow-100 text-yellow-800 border-yellow-300",
-};
-
 const TEAM_BADGE: Record<Team, string> = {
   Rot: "bg-red-600 text-white",
   Gelb: "bg-yellow-400 text-yellow-900",
@@ -39,7 +34,6 @@ const TEAM_BADGE: Record<Team, string> = {
 export default function SpielberichtFormular({ spielId, teilnehmer, initialTore }: Props) {
   const [tore, setTore] = useState<Tor[]>(initialTore);
 
-  // Form state
   const [scorerId, setScorerId] = useState<string>("");
   const [assistId, setAssistId] = useState<string>("");
   const [eigentor, setEigentor] = useState<boolean>(false);
@@ -49,15 +43,11 @@ export default function SpielberichtFormular({ spielId, teilnehmer, initialTore 
   const [isPending, startTransition] = useTransition();
   const [isAbschliessen, startAbschliessen] = useTransition();
 
-  // Derive team for scorer automatically when not eigentor
   const selectedSpieler = teilnehmer.find((t) => t.id === scorerId);
 
-  // When eigentor changes, auto-set team to scorer's team
-  // (team = shooting player's team; eigentor counts for opponent)
   function handleScorerChange(id: string) {
     setScorerId(id);
-    setAssistId(""); // reset assist when scorer changes
-    // Auto-set team to the player's assigned team
+    setAssistId("");
     const spieler = teilnehmer.find((t) => t.id === id);
     if (spieler) {
       setTorTeam(spieler.team);
@@ -92,7 +82,6 @@ export default function SpielberichtFormular({ spielId, teilnehmer, initialTore 
         return;
       }
 
-      // Optimistic update — add the new goal locally
       if (result.torId) {
         const scorer = teilnehmer.find((t) => t.id === scorerId)!;
         const assist = assistId ? (teilnehmer.find((t) => t.id === assistId) ?? null) : null;
@@ -106,7 +95,6 @@ export default function SpielberichtFormular({ spielId, teilnehmer, initialTore 
         setTore((prev) => [...prev, neuesTor]);
       }
 
-      // Reset form
       setScorerId("");
       setAssistId("");
       setEigentor(false);
@@ -133,42 +121,40 @@ export default function SpielberichtFormular({ spielId, teilnehmer, initialTore 
       if (result?.fehler) {
         setFehler(result.fehler);
       }
-      // On success, the server action redirects — no local state needed
     });
   }
 
-  // Possible assist players: same match, different from scorer
   const moeglicheAssists = teilnehmer.filter((t) => t.id !== scorerId);
 
   return (
     <div className="flex flex-col gap-6">
       {/* Live-Ergebnis */}
       <div className="flex items-center gap-4">
-        <div className="flex-1 rounded-xl border-2 border-red-200 bg-red-50 py-4 text-center">
-          <span className="block text-4xl font-bold text-red-600">{ergebnis.rot}</span>
-          <span className="text-xs font-semibold uppercase tracking-wide text-red-700 mt-1 block">Rot</span>
+        <div className="flex-1 rounded-xl border-2 border-red-800/60 bg-red-900/30 py-4 text-center">
+          <span className="block text-4xl font-bold text-red-400">{ergebnis.rot}</span>
+          <span className="text-xs font-semibold uppercase tracking-wide text-red-400 mt-1 block">Rot</span>
         </div>
-        <span className="text-2xl font-bold text-gray-400">:</span>
-        <div className="flex-1 rounded-xl border-2 border-yellow-300 bg-yellow-50 py-4 text-center">
-          <span className="block text-4xl font-bold text-yellow-600">{ergebnis.gelb}</span>
-          <span className="text-xs font-semibold uppercase tracking-wide text-yellow-700 mt-1 block">Gelb</span>
+        <span className="text-2xl font-bold text-gray-500">:</span>
+        <div className="flex-1 rounded-xl border-2 border-yellow-800/60 bg-yellow-900/30 py-4 text-center">
+          <span className="block text-4xl font-bold text-yellow-400">{ergebnis.gelb}</span>
+          <span className="text-xs font-semibold uppercase tracking-wide text-yellow-400 mt-1 block">Gelb</span>
         </div>
       </div>
 
       {/* Torliste */}
       {tore.length > 0 && (
         <div>
-          <h3 className="text-sm font-semibold text-gray-600 mb-2">
+          <h3 className="text-sm font-semibold text-gray-400 mb-2">
             Tore ({tore.length})
           </h3>
           <ul className="flex flex-col gap-2">
             {tore.map((tor, idx) => (
               <li
                 key={tor.id}
-                className="flex items-center justify-between gap-3 rounded-lg border border-gray-100 bg-white px-3 py-2 shadow-sm"
+                className="flex items-center justify-between gap-3 rounded-lg border border-gray-700 bg-gray-900/40 px-3 py-2"
               >
                 <div className="flex items-center gap-2 flex-wrap">
-                  <span className="text-sm font-medium text-gray-400 w-5 text-right">
+                  <span className="text-sm font-medium text-gray-500 w-5 text-right">
                     {idx + 1}.
                   </span>
                   <span
@@ -177,15 +163,15 @@ export default function SpielberichtFormular({ spielId, teilnehmer, initialTore 
                     {tor.team}
                   </span>
                   {tor.eigentor && (
-                    <span className="rounded-full bg-orange-100 px-2 py-0.5 text-xs font-semibold text-orange-700 border border-orange-200">
+                    <span className="rounded-full bg-orange-900/40 px-2 py-0.5 text-xs font-semibold text-orange-400 border border-orange-700/40">
                       ET
                     </span>
                   )}
-                  <span className="text-sm text-gray-800 font-medium">
+                  <span className="text-sm text-gray-100 font-medium">
                     {tor.scorer.name}
                   </span>
                   {tor.assist && (
-                    <span className="text-xs text-gray-400">
+                    <span className="text-xs text-gray-500">
                       (Vorlage: {tor.assist.name})
                     </span>
                   )}
@@ -194,7 +180,7 @@ export default function SpielberichtFormular({ spielId, teilnehmer, initialTore 
                   type="button"
                   onClick={() => handleTorLoeschen(tor.id)}
                   disabled={isPending}
-                  className="shrink-0 rounded-md border border-gray-200 px-2 py-1 text-xs text-gray-400 hover:border-red-300 hover:text-red-500 transition-colors disabled:opacity-40"
+                  className="shrink-0 rounded-md border border-gray-600 px-2 py-1 text-xs text-gray-500 hover:border-red-700 hover:text-red-400 transition-colors disabled:opacity-40"
                 >
                   Löschen
                 </button>
@@ -206,17 +192,17 @@ export default function SpielberichtFormular({ spielId, teilnehmer, initialTore 
 
       {/* Tor hinzufügen */}
       <form onSubmit={handleTorHinzufuegen} className="flex flex-col gap-4">
-        <h3 className="text-sm font-semibold text-gray-600">Tor hinzufügen</h3>
+        <h3 className="text-sm font-semibold text-gray-400">Tor hinzufügen</h3>
 
         {/* Torschütze */}
         <div>
-          <label className="block text-xs font-medium text-gray-600 mb-1">
+          <label className="block text-xs font-medium text-gray-300 mb-1">
             Torschütze *
           </label>
           <select
             value={scorerId}
             onChange={(e) => handleScorerChange(e.target.value)}
-            className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-gray-800 focus:border-gray-400 focus:outline-none"
+            className="w-full rounded-lg border border-gray-600 bg-gray-900 px-3 py-2 text-sm text-gray-100 focus:border-gray-400 focus:outline-none"
           >
             <option value="">— Spieler auswählen —</option>
             {(["Rot", "Gelb"] as Team[]).map((team) => (
@@ -235,14 +221,14 @@ export default function SpielberichtFormular({ spielId, teilnehmer, initialTore 
 
         {/* Vorlagengeber */}
         <div>
-          <label className="block text-xs font-medium text-gray-600 mb-1">
+          <label className="block text-xs font-medium text-gray-300 mb-1">
             Vorlagengeber (optional)
           </label>
           <select
             value={assistId}
             onChange={(e) => setAssistId(e.target.value)}
             disabled={!scorerId}
-            className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-gray-800 focus:border-gray-400 focus:outline-none disabled:opacity-50"
+            className="w-full rounded-lg border border-gray-600 bg-gray-900 px-3 py-2 text-sm text-gray-100 focus:border-gray-400 focus:outline-none disabled:opacity-50"
           >
             <option value="">— kein Vorlagengeber —</option>
             {moeglicheAssists.map((t) => (
@@ -255,9 +241,9 @@ export default function SpielberichtFormular({ spielId, teilnehmer, initialTore 
 
         {/* Team */}
         <div>
-          <label className="block text-xs font-medium text-gray-600 mb-1">
+          <label className="block text-xs font-medium text-gray-300 mb-1">
             Team *{" "}
-            <span className="text-gray-400 font-normal">
+            <span className="text-gray-500 font-normal">
               (bei Eigentor: Team des schießenden Spielers)
             </span>
           </label>
@@ -270,7 +256,7 @@ export default function SpielberichtFormular({ spielId, teilnehmer, initialTore 
                 className={`flex-1 rounded-lg border px-4 py-2 text-sm font-semibold transition-colors ${
                   torTeam === team
                     ? TEAM_BADGE[team]
-                    : `border-gray-200 bg-white text-gray-600 hover:bg-gray-50`
+                    : "border-gray-600 bg-gray-800 text-gray-300 hover:bg-gray-700"
                 }`}
               >
                 {team}
@@ -278,7 +264,7 @@ export default function SpielberichtFormular({ spielId, teilnehmer, initialTore 
             ))}
           </div>
           {selectedSpieler && torTeam && torTeam !== selectedSpieler.team && !eigentor && (
-            <p className="mt-1 text-xs text-amber-600">
+            <p className="mt-1 text-xs text-amber-400">
               Hinweis: Torschütze spielt in Team {selectedSpieler.team}.
             </p>
           )}
@@ -290,18 +276,18 @@ export default function SpielberichtFormular({ spielId, teilnehmer, initialTore 
             type="checkbox"
             checked={eigentor}
             onChange={(e) => setEigentor(e.target.checked)}
-            className="h-4 w-4 rounded border-gray-300 accent-gray-800"
+            className="h-4 w-4 rounded border-gray-600 accent-red-500"
           />
-          <span className="text-sm text-gray-700">
+          <span className="text-sm text-gray-300">
             Eigentor{" "}
-            <span className="text-xs text-gray-400">
+            <span className="text-xs text-gray-500">
               (zählt für das gegnerische Team)
             </span>
           </span>
         </label>
 
         {eigentor && torTeam && (
-          <p className="rounded-lg border border-orange-200 bg-orange-50 px-3 py-2 text-xs text-orange-700">
+          <p className="rounded-lg border border-orange-700/60 bg-orange-900/30 px-3 py-2 text-xs text-orange-400">
             Eigentor: Das Tor wird{" "}
             <strong>{torTeam === "Rot" ? "Gelb" : "Rot"}</strong> gutgeschrieben.
           </p>
@@ -310,7 +296,7 @@ export default function SpielberichtFormular({ spielId, teilnehmer, initialTore 
         {fehler && (
           <p
             role="alert"
-            className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-600"
+            className="rounded-lg border border-red-700/60 bg-red-900/40 px-3 py-2 text-sm text-red-400"
           >
             {fehler}
           </p>
@@ -319,14 +305,14 @@ export default function SpielberichtFormular({ spielId, teilnehmer, initialTore 
         <button
           type="submit"
           disabled={isPending || !scorerId || !torTeam}
-          className="w-full rounded-lg bg-gray-800 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-gray-700 disabled:cursor-not-allowed disabled:opacity-50"
+          className="w-full rounded-lg bg-red-600 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-red-500 disabled:cursor-not-allowed disabled:opacity-50"
         >
           {isPending ? "Speichern..." : "Tor hinzufügen"}
         </button>
       </form>
 
       {/* Spiel abschließen */}
-      <div className="border-t border-gray-100 pt-4">
+      <div className="border-t border-gray-700 pt-4">
         <p className="text-xs text-gray-500 mb-3">
           Wenn alle Tore erfasst sind, das Spiel abschließen.
         </p>
@@ -334,7 +320,7 @@ export default function SpielberichtFormular({ spielId, teilnehmer, initialTore 
           type="button"
           onClick={handleAbschliessen}
           disabled={isAbschliessen}
-          className="w-full rounded-lg border-2 border-green-600 bg-green-600 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-green-700 disabled:cursor-not-allowed disabled:opacity-50"
+          className="w-full rounded-lg bg-green-700 border-2 border-green-600 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-green-600 disabled:cursor-not-allowed disabled:opacity-50"
         >
           {isAbschliessen ? "Abschließen..." : "Spiel abschließen"}
         </button>

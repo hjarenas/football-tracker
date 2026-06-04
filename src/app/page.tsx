@@ -1,5 +1,4 @@
 import { prisma } from "@/lib/prisma";
-import Link from "next/link";
 import {
   berechneStatistiken,
   type StatistikEingabe,
@@ -8,7 +7,7 @@ import {
 import { SaisonSelektor } from "./SaisonSelektor";
 
 // ---------------------------------------------------------------------------
-// Leaderboard table component
+// Leaderboard card
 // ---------------------------------------------------------------------------
 
 function Rangliste({
@@ -23,40 +22,42 @@ function Rangliste({
   einheitPlural: string;
 }) {
   return (
-    <section className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-      <div className="px-4 py-3 border-b border-gray-100 bg-gray-50">
-        <h2 className="text-base font-bold text-gray-800">{titel}</h2>
+    <section className="rounded-xl overflow-hidden border border-gray-700">
+      <div className="px-4 py-3 border-b border-gray-700 bg-gray-700/50">
+        <h2 className="text-sm font-bold text-gray-100 uppercase tracking-wide">
+          {titel}
+        </h2>
       </div>
       {eintraege.length === 0 ? (
-        <p className="p-4 text-sm text-gray-400 text-center">
+        <p className="p-4 text-sm text-gray-500 text-center">
           Noch keine Daten für diese Saison.
         </p>
       ) : (
-        <ol className="divide-y divide-gray-50">
+        <ol className="divide-y divide-gray-700/60">
           {eintraege.map((eintrag) => (
             <li
               key={eintrag.spielerId}
-              className="flex items-center gap-3 px-4 py-2.5"
+              className="flex items-center gap-3 px-4 py-2.5 bg-gray-800 hover:bg-gray-700/40 transition-colors"
             >
               <span
-                className={`w-7 text-center text-sm font-bold tabular-nums shrink-0 ${
+                className={`w-6 text-center text-sm font-bold tabular-nums shrink-0 ${
                   eintrag.rang === 1
-                    ? "text-yellow-500"
+                    ? "text-yellow-400"
                     : eintrag.rang === 2
                     ? "text-gray-400"
                     : eintrag.rang === 3
-                    ? "text-amber-700"
-                    : "text-gray-300"
+                    ? "text-amber-600"
+                    : "text-gray-600"
                 }`}
               >
                 {eintrag.rang}.
               </span>
-              <span className="flex-1 text-sm text-gray-800 font-medium">
+              <span className="flex-1 text-sm text-gray-100 font-medium">
                 {eintrag.spielerName}
               </span>
-              <span className="text-sm text-gray-600 tabular-nums shrink-0">
+              <span className="text-sm text-gray-300 tabular-nums shrink-0">
                 {eintrag.wert}{" "}
-                <span className="text-gray-400 text-xs">
+                <span className="text-gray-500 text-xs">
                   {eintrag.wert === 1 ? einheitSingular : einheitPlural}
                 </span>
               </span>
@@ -79,12 +80,10 @@ interface HomePageProps {
 export default async function HomePage({ searchParams }: HomePageProps) {
   const params = await searchParams;
 
-  // Fetch all Saisons for the selector
   const saisons = await prisma.saison.findMany({
     orderBy: { jahr: "desc" },
   });
 
-  // Determine current scope
   const aktuellesSaisonJahr =
     saisons.length > 0 ? saisons[0].jahr : new Date().getFullYear();
 
@@ -96,7 +95,6 @@ export default async function HomePage({ searchParams }: HomePageProps) {
       ? parseInt(saisonParam, 10)
       : aktuellesSaisonJahr;
 
-  // Fetch all data needed for the engine
   const [spieler, spiele, teilnahmen, tore] = await Promise.all([
     prisma.spieler.findMany({ select: { id: true, name: true } }),
     prisma.spiel.findMany({
@@ -128,7 +126,6 @@ export default async function HomePage({ searchParams }: HomePageProps) {
     }),
   ]);
 
-  // Shape data for the engine
   const eingabe: StatistikEingabe = {
     spieler: spieler.map((s) => ({ id: s.id, name: s.name })),
     spiele: spiele.map((s) => ({
@@ -161,81 +158,50 @@ export default async function HomePage({ searchParams }: HomePageProps) {
     scope === "all-time" ? "Alle Zeiten" : `Saison ${scope}`;
 
   return (
-    <main className="min-h-screen bg-gray-50 pb-10">
-      {/* Header */}
-      <div className="bg-white border-b border-gray-100 shadow-sm">
-        <div className="w-full max-w-lg mx-auto px-4 py-5">
-          <div className="flex items-start justify-between">
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900">Dienstagskicken</h1>
-              <p className="text-sm text-gray-500 mt-0.5">
-                Fußball-Tracker · Vereins Weißkirchen
-              </p>
-            </div>
-            <Link
-              href="/anmelden"
-              className="text-xs font-medium text-gray-500 hover:text-gray-800 border border-gray-200 rounded-lg px-3 py-1.5 hover:border-gray-400 transition-colors"
-            >
-              Verwaltung
-            </Link>
-          </div>
-        </div>
-      </div>
-
-      <div className="w-full max-w-lg mx-auto px-4 pt-6 space-y-5">
-        {/* Season selector + navigation */}
-        <div className="flex items-center justify-between gap-2">
-          <h2 className="text-lg font-semibold text-gray-800">{saisonLabel}</h2>
-          <div className="flex items-center gap-2">
-            <SaisonSelektor
-              saisons={saisons.map((s) => s.jahr)}
-              aktuellerScope={scope}
-            />
-            <Link
-              href="/spiele"
-              className="text-xs text-gray-500 hover:text-gray-700 underline underline-offset-2"
-            >
-              Spielübersicht
-            </Link>
-          </div>
+    <main className="min-h-screen pb-12">
+      <div className="max-w-6xl mx-auto px-4 pt-6">
+        {/* Season selector */}
+        <div className="flex items-center justify-between gap-3 mb-6">
+          <h1 className="text-lg font-bold text-gray-100">{saisonLabel}</h1>
+          <SaisonSelektor
+            saisons={saisons.map((s) => s.jahr)}
+            aktuellerScope={scope}
+          />
         </div>
 
-        {/* Five leaderboard tables */}
-        <Rangliste
-          titel="Torjägerliste"
-          eintraege={statistiken.torjaeger}
-          einheitSingular="Tor"
-          einheitPlural="Tore"
-        />
-
-        <Rangliste
-          titel="Vorlagenliste"
-          eintraege={statistiken.vorlagen}
-          einheitSingular="Vorlage"
-          einheitPlural="Vorlagen"
-        />
-
-        <Rangliste
-          titel="Punktetabelle"
-          eintraege={statistiken.punkte}
-          einheitSingular="Punkt"
-          einheitPlural="Punkte"
-        />
-
-        <Rangliste
-          titel="Anwesenheitsliste"
-          eintraege={statistiken.anwesenheit}
-          einheitSingular="Spiel"
-          einheitPlural="Spiele"
-        />
-
-        <Rangliste
-          titel="Bierliste"
-          eintraege={statistiken.bier}
-          einheitSingular="Mal"
-          einheitPlural="Mal"
-        />
-
+        {/* 3-col leaderboard grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <Rangliste
+            titel="Torjägerliste"
+            eintraege={statistiken.torjaeger}
+            einheitSingular="Tor"
+            einheitPlural="Tore"
+          />
+          <Rangliste
+            titel="Vorlagenliste"
+            eintraege={statistiken.vorlagen}
+            einheitSingular="Vorlage"
+            einheitPlural="Vorlagen"
+          />
+          <Rangliste
+            titel="Punktetabelle"
+            eintraege={statistiken.punkte}
+            einheitSingular="Punkt"
+            einheitPlural="Punkte"
+          />
+          <Rangliste
+            titel="Anwesenheitsliste"
+            eintraege={statistiken.anwesenheit}
+            einheitSingular="Spiel"
+            einheitPlural="Spiele"
+          />
+          <Rangliste
+            titel="Bierliste"
+            eintraege={statistiken.bier}
+            einheitSingular="Mal"
+            einheitPlural="Mal"
+          />
+        </div>
       </div>
     </main>
   );
