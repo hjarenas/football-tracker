@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { spielPlanenAction } from "../actions";
+import { spielerErstellenAction } from "../../spieler/actions";
 
 interface Spieler {
   id: string;
@@ -25,18 +26,47 @@ export default function SpielPlanenFormular({
     Set<string>
   >(new Set());
   const [teilnehmerSuche, setTeilnehmerSuche] = useState("");
+  const [extraSpieler, setExtraSpieler] = useState<Spieler[]>([]);
+  const [neuerSpielerName, setNeuerSpielerName] = useState("");
+  const [neuerSpielerFehler, setNeuerSpielerFehler] = useState<string | null>(null);
+  const [isCreating, startCreatingTransition] = useTransition();
   const [fehler, setFehler] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
 
-  const gefilterteBierbringer = spieler.filter((s) =>
+  // Merge server-provided list with client-side newly created players,
+  // deduplicating by id so that revalidatePath re-renders don't produce duplicate keys.
+  const spielerIds = new Set(spieler.map((s) => s.id));
+  const alleSpieler = [...spieler, ...extraSpieler.filter((s) => !spielerIds.has(s.id))];
+
+  const gefilterteBierbringer = alleSpieler.filter((s) =>
     s.name.toLowerCase().includes(bierbringerSuche.toLowerCase())
   );
 
-  const gefilterteTeilnehmer = spieler.filter((s) =>
+  const gefilterteTeilnehmer = alleSpieler.filter((s) =>
     s.name.toLowerCase().includes(teilnehmerSuche.toLowerCase())
   );
 
-  const ausgewaehlterBierbringer = spieler.find((s) => s.id === bierbringerId);
+  const ausgewaehlterBierbringer = alleSpieler.find((s) => s.id === bierbringerId);
+
+  async function handleNeuerSpieler() {
+    const trimmed = neuerSpielerName.trim();
+    if (!trimmed) return;
+    setNeuerSpielerFehler(null);
+
+    startCreatingTransition(async () => {
+      const result = await spielerErstellenAction(trimmed);
+      if (result.fehler) {
+        setNeuerSpielerFehler(result.fehler);
+        return;
+      }
+      if (result.id && result.name) {
+        const neuer: Spieler = { id: result.id, name: result.name };
+        setExtraSpieler((prev) => [...prev, neuer]);
+        setAusgewaehlteTeilnehmer((prev) => new Set([...prev, result.id!]));
+        setNeuerSpielerName("");
+      }
+    });
+  }
 
   function toggleTeilnehmer(id: string) {
     setAusgewaehlteTeilnehmer((prev) => {
@@ -51,7 +81,7 @@ export default function SpielPlanenFormular({
   }
 
   function alleAuswaehlen() {
-    setAusgewaehlteTeilnehmer(new Set(spieler.map((s) => s.id)));
+    setAusgewaehlteTeilnehmer(new Set(alleSpieler.map((s) => s.id)));
   }
 
   function alleAbwaehlen() {
@@ -202,6 +232,34 @@ export default function SpielPlanenFormular({
           onChange={(e) => setTeilnehmerSuche(e.target.value)}
           className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-gray-800 mb-2"
         />
+
+        {/* Inline new player creation */}
+        <div className="flex gap-2 mb-2">
+          <input
+            type="text"
+            placeholder="Neuen Spieler hinzufügen..."
+            value={neuerSpielerName}
+            onChange={(e) => setNeuerSpielerName(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault();
+                handleNeuerSpieler();
+              }
+            }}
+            className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-gray-800"
+          />
+          <button
+            type="button"
+            onClick={handleNeuerSpieler}
+            disabled={isCreating || !neuerSpielerName.trim()}
+            className="px-3 py-2 bg-gray-100 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          >
+            {isCreating ? "..." : "Hinzufügen"}
+          </button>
+        </div>
+        {neuerSpielerFehler && (
+          <p className="text-xs text-red-600 mb-2">{neuerSpielerFehler}</p>
+        )}
 
         <div className="border border-gray-200 rounded-lg max-h-64 overflow-y-auto divide-y divide-gray-100">
           {gefilterteTeilnehmer.map((s) => {
