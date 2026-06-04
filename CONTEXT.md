@@ -10,7 +10,8 @@ Use these terms exactly as written. Do not substitute synonyms.
 
 | Term | Definition |
 |---|---|
-| **Spieler** | A player. Has a name and an `aktiv` flag. ~40 in the pool; no self-registration. |
+| **Spieler** | A player. Has a name, an `aktiv` flag, and a `vereinsmitglied` flag. ~40 in the pool; no self-registration. |
+| **Vereinsmitglied** | Administrative flag on Spieler. Marks whether the player is a formal club member. No effect on stats, leaderboards, or match participation — display/admin only. |
 | **Saison** | A season, identified by calendar year (integer). Awards and leaderboards are scoped per Saison. |
 | **Spiel** | A match. Has a date, a Saison FK, a status, and an optional beer-bringer (Spieler FK). |
 | **Spielteilnahme** | Match participation — the join between Spieler and Spiel. Records which team the player was on and an optional points override. |
@@ -60,6 +61,10 @@ These rules are non-negotiable and enforced throughout the codebase:
 5. **`pointsOverride` on Spielteilnahme** overrides which team's result the player receives points for, without changing their actual team assignment.
 
 6. **Rot and Gelb are the only two team identifiers.** They are not configurable. (ADR-0003)
+
+7. **Inactive Spieler (`aktiv = false`) are never shown in match setup pickers.** They are only visible on the `/admin/spieler` management page.
+
+8. **Player picker ordering uses rolling-window activity buckets.** Three buckets, in order: (1) Spielteilnahme in last 90 days, (2) Spielteilnahme in last 365 days but not last 90, (3) no participation in the last year. Within each bucket, alphabetical by name. Applies to match setup only — `/admin/spieler` is alphabetical.
 
 ---
 
