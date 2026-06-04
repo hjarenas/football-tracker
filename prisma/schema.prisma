@@ -25,11 +25,12 @@ enum SpielStatus {
 
 // Spieler — a football player
 model Spieler {
-  id        String   @id @default(cuid())
-  name      String   @unique
-  aktiv     Boolean  @default(true)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id              String   @id @default(cuid())
+  name            String   @unique
+  aktiv           Boolean  @default(true)
+  vereinsmitglied Boolean  @default(false)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 
   // Relations
   teilnahmen    Spielteilnahme[] @relation("SpielerTeilnahmen")
