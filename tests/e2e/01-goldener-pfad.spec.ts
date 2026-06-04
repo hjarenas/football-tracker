@@ -73,7 +73,7 @@ test("Goldener Pfad — full admin flow from session to public match result", as
 
   // Select 4 attendees
   const playerCheckboxes = page.locator(
-    'div.border.border-gray-200.rounded-lg input[type="checkbox"]'
+    'div.border.border-gray-600.rounded-lg input[type="checkbox"]'
   );
   await playerCheckboxes.nth(0).check();
   await playerCheckboxes.nth(1).check();

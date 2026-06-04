@@ -56,7 +56,7 @@ test("cancelled match appears in /spiele with Abgesagt label and no score", asyn
 
   // Select the first two players as attendees
   const checkboxes = page.locator(
-    'div.border.border-gray-200.rounded-lg input[type="checkbox"]'
+    'div.border.border-gray-600.rounded-lg input[type="checkbox"]'
   );
   await checkboxes.nth(0).check();
   await checkboxes.nth(1).check();

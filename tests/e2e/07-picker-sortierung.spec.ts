@@ -91,7 +91,7 @@ test("recent player appears before never-played player in Teilnehmer picker", as
 
   // The Teilnehmer picker renders player names in <span> elements inside checkboxes
   const teilnehmerBox = page.locator(
-    "div.border.border-gray-200.rounded-lg"
+    "div.border.border-gray-600.rounded-lg"
   );
   await expect(teilnehmerBox).toBeVisible();
 

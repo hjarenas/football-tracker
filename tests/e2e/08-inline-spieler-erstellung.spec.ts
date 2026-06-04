@@ -58,7 +58,7 @@ test("Admin creates a player inline in match setup and they appear auto-selected
   await page.waitForLoadState("networkidle");
 
   // The new player should appear in the attendee list as checked
-  const attendeeList = page.locator("div.border.border-gray-200.rounded-lg");
+  const attendeeList = page.locator("div.border.border-gray-600.rounded-lg");
   await expect(attendeeList).toContainText("Zoran Novak");
 
   // The checkbox for the new player should be checked

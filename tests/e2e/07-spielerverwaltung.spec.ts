@@ -80,7 +80,7 @@ test("Admin toggles aktiv off; player disappears from match setup picker", async
   await page.waitForLoadState("networkidle");
 
   // Alexander Bauer should NOT appear in the attendee checkbox list
-  const attendeeList = page.locator('div.border.border-gray-200.rounded-lg');
+  const attendeeList = page.locator('div.border.border-gray-600.rounded-lg');
   await expect(attendeeList).not.toContainText("Alexander Bauer");
 });
 
