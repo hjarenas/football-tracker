@@ -29,6 +29,12 @@ export default async function AdminPage() {
           >
             Spiele verwalten
           </Link>
+          <Link
+            href="/admin/spieler"
+            className="w-full py-2 px-4 bg-gray-800 text-white text-center font-semibold rounded-lg hover:bg-gray-700 transition-colors text-sm"
+          >
+            Spieler verwalten
+          </Link>
         </div>
 
         <form
