@@ -20,10 +20,9 @@ export default async function globalSetup() {
     }
   }
 
-  // Run prisma db push to ensure the test DB schema matches the Prisma schema.
-  // --accept-data-loss is safe here because this is a throwaway test DB.
+  // Apply migrations to ensure the test DB schema is up to date.
   try {
-    execSync("npx prisma db push --accept-data-loss", {
+    execSync("npx prisma migrate deploy", {
       env: {
         ...process.env,
         DATABASE_URL: process.env.DATABASE_URL,
