@@ -17,7 +17,8 @@
     "db:migrate": "prisma migrate dev",
     "db:push": "prisma db push",
     "db:seed": "prisma db seed",
-    "db:studio": "prisma studio"
+    "db:studio": "prisma studio",
+    "prepare": "husky"
   },
   "keywords": [],
   "author": "",
@@ -49,6 +50,7 @@
     "@vitejs/plugin-react": "^6.0.2",
     "eslint": "^9.39.4",
     "eslint-config-next": "^16.2.6",
+    "husky": "^9.1.7",
     "typescript": "^6.0.3",
     "vite": "^8.0.14",
     "vitest": "^4.1.7"
