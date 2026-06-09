@@ -61,9 +61,10 @@ test("cancelled match appears in /spiele with Abgesagt label and no score", asyn
   await checkboxes.nth(0).check();
   await checkboxes.nth(1).check();
 
-  await page.click('button[type="submit"]');
-  // After planning, redirected to /admin/spiele
-  await page.waitForURL(/\/admin\/spiele/);
+  // Use text-based selector to avoid matching the header's sign-out submit button
+  await page.click('button[type="submit"]:has-text("Spiel planen")');
+  // After planning, redirected to /admin/spiele (exact path, not /neu)
+  await page.waitForURL((url) => url.pathname === "/admin/spiele");
   await page.waitForLoadState("networkidle");
 
   // --- Step 3: open the newly created match ---

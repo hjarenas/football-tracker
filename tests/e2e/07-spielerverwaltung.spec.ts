@@ -125,13 +125,15 @@ test("Admin renames a player; new name appears in the list", async ({
   const renameButton = benjaminRow.locator('button[aria-label*="umbenennen"]').first();
   await renameButton.click();
 
-  // Fill in new name
-  const renameInput = benjaminRow.locator('input[type="text"]').first();
+  // Fill in new name — after clicking Umbenennen the name text moves into an input
+  // value, so benjaminRow (hasText filter) goes stale; locate the inline rename
+  // input directly inside any <li> instead.
+  const renameInput = page.locator('li input[type="text"]').first();
   await renameInput.clear();
   await renameInput.fill("Benjamin Fischer-Updated");
 
-  // Confirm rename via Speichern button
-  const confirmButton = benjaminRow.locator('button:has-text("Speichern")').first();
+  // Confirm rename — benjaminRow is stale now (name moved to input value), locate Speichern at page level
+  const confirmButton = page.locator('li button:has-text("Speichern")').first();
   await confirmButton.click();
   await page.waitForLoadState("networkidle");
 
