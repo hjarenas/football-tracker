@@ -15,6 +15,7 @@ services:
       - NEXTAUTH_URL=${NEXTAUTH_URL}
       - ADMIN_CREDENTIALS=${ADMIN_CREDENTIALS}
       - NODE_ENV=production
+    command: sh -c "node_modules/.bin/prisma migrate deploy && node server.js"
     depends_on:
       db:
         condition: service_healthy
