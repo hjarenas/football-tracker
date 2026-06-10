@@ -15,9 +15,9 @@ const testEnv = {
   DATABASE_URL:
     process.env.DATABASE_URL ??
     "postgresql://postgres:postgres@localhost:5432/dienstagskicken_test",
-  NEXTAUTH_SECRET:
-    process.env.NEXTAUTH_SECRET ?? "test-secret-for-e2e-testing-only",
-  NEXTAUTH_URL: process.env.NEXTAUTH_URL ?? "http://localhost:3000",
+  AUTH_SECRET:
+    process.env.AUTH_SECRET ?? "test-secret-for-e2e-testing-only",
+  AUTH_URL: process.env.AUTH_URL ?? "http://localhost:3000",
   ADMIN_CREDENTIALS: process.env.ADMIN_CREDENTIALS ?? "testadmin:testpassword",
 };
 

@@ -7,7 +7,7 @@
  *
  * This approach is equivalent to being logged in because:
  * 1. The middleware uses `auth()` (server-side) which reads and verifies the JWT cookie
- * 2. The cookie is signed with the same NEXTAUTH_SECRET the server uses
+ * 2. The cookie is signed with the same AUTH_SECRET the server uses
  *
  * Cookie name in NextAuth v5 (Auth.js): "authjs.session-token"
  * The salt used for the session token cookie is "authjs.session-token"
@@ -16,8 +16,8 @@
 import { encode } from "next-auth/jwt";
 import type { Page } from "@playwright/test";
 
-const NEXTAUTH_SECRET =
-  process.env.NEXTAUTH_SECRET ?? "test-secret-for-e2e-testing-only";
+const AUTH_SECRET =
+  process.env.AUTH_SECRET ?? "test-secret-for-e2e-testing-only";
 
 // Cookie name used by NextAuth v5 in HTTP (non-HTTPS) context
 const SESSION_COOKIE_NAME = "authjs.session-token";
@@ -40,7 +40,7 @@ export async function setAdminSession(page: Page): Promise<void> {
       exp: Math.floor(Date.now() / 1000) + 60 * 60 * 24, // 24 hours
       jti: `test-${Date.now()}`,
     },
-    secret: NEXTAUTH_SECRET,
+    secret: AUTH_SECRET,
     salt: SESSION_COOKIE_NAME,
   });
 
