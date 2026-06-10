@@ -41,6 +41,19 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+
+      - name: Copy config files to VPS
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: deploy
+          key: ${{ secrets.HETZNER_SSH_KEY }}
+          source: "docker-compose.prod.yml,Caddyfile"
+          target: /opt/dienstagskicken/
+
       - name: Deploy to Hetzner VPS
         uses: appleboy/ssh-action@v1.0.3
         env:
@@ -54,7 +67,6 @@ jobs:
           script: |
             echo "$GHCR_TOKEN" | docker login ghcr.io -u "$GHCR_ACTOR" --password-stdin
             cd /opt/dienstagskicken
-            git pull origin main
             docker compose -f docker-compose.prod.yml pull app
             docker compose -f docker-compose.prod.yml up -d
             docker logout ghcr.io
