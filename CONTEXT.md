@@ -66,6 +66,8 @@ These rules are non-negotiable and enforced throughout the codebase:
 
 8. **Player picker ordering uses rolling-window activity buckets.** Three buckets, in order: (1) Spielteilnahme in last 90 days, (2) Spielteilnahme in last 365 days but not last 90, (3) no participation in the last year. Within each bucket, alphabetical by name. Applies to match setup only — `/admin/spieler` is alphabetical.
 
+9. **A Tor's assist must be on the scorer's own team, unless the Tor is an Eigentor.** For Eigentor, this rule is not enforced — the assist picker stays unfiltered and any cross-team combination is allowed, entered manually. Enforced both in the assist picker (UI) and in the server actions that create/edit Tore.
+
 ---
 
 ## Architecture Decisions

@@ -6,6 +6,33 @@ import { revalidatePath } from "next/cache";
 import { transition } from "@/lib/zustandsmaschine";
 import { SpielStatus, Team } from "@prisma/client";
 
+/**
+ * Vorlagengeber must share the scorer's team unless the Tor is an Eigentor
+ * (own-goal assists aren't filtered — handled manually per CONTEXT.md).
+ */
+async function vorlageTeamFehler(
+  spielId: string,
+  scorerId: string,
+  assistId: string,
+  eigentor: boolean
+): Promise<string | null> {
+  if (eigentor) return null;
+
+  const teilnahmen = await prisma.spielteilnahme.findMany({
+    where: { spielId, spielerId: { in: [scorerId, assistId] } },
+    select: { spielerId: true, team: true },
+  });
+
+  const scorerTeam = teilnahmen.find((t) => t.spielerId === scorerId)?.team;
+  const assistTeam = teilnahmen.find((t) => t.spielerId === assistId)?.team;
+
+  if (scorerTeam && assistTeam && scorerTeam !== assistTeam) {
+    return "Vorlagengeber muss im selben Team wie der Torschütze sein.";
+  }
+
+  return null;
+}
+
 export interface SpielPlanenResult {
   fehler?: string;
 }
@@ -183,6 +210,13 @@ export async function torErfassenAction(
 
   const eigentor = eigentorValue === "true";
   const team = teamValue as Team;
+
+  if (assistId) {
+    const teamFehler = await vorlageTeamFehler(spielId, scorerId, assistId, eigentor);
+    if (teamFehler) {
+      return { fehler: teamFehler };
+    }
+  }
 
   try {
     const spiel = await prisma.spiel.findUnique({
@@ -550,6 +584,13 @@ export async function torBearbeitenAction(
   const eigentor = eigentorValue === "true";
   const team = teamValue as Team;
 
+  if (assistId) {
+    const teamFehler = await vorlageTeamFehler(spielId, scorerId, assistId, eigentor);
+    if (teamFehler) {
+      return { fehler: teamFehler };
+    }
+  }
+
   try {
     const spiel = await prisma.spiel.findUnique({
       where: { id: spielId },
@@ -611,6 +652,13 @@ export async function torHinzufuegenAbgeschlossenAction(
 
   const eigentor = eigentorValue === "true";
   const team = teamValue as Team;
+
+  if (assistId) {
+    const teamFehler = await vorlageTeamFehler(spielId, scorerId, assistId, eigentor);
+    if (teamFehler) {
+      return { fehler: teamFehler };
+    }
+  }
 
   try {
     const spiel = await prisma.spiel.findUnique({

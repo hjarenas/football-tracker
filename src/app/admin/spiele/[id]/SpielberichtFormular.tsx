@@ -54,6 +54,16 @@ export default function SpielberichtFormular({ spielId, teilnehmer, initialTore 
     }
   }
 
+  function handleEigentorChange(checked: boolean) {
+    setEigentor(checked);
+    if (!checked && assistId && selectedSpieler) {
+      const assist = teilnehmer.find((t) => t.id === assistId);
+      if (assist && assist.team !== selectedSpieler.team) {
+        setAssistId("");
+      }
+    }
+  }
+
   const ergebnis = deriveScore(tore.map((t) => ({ team: t.team, eigentor: t.eigentor })));
 
   async function handleTorHinzufuegen(e: React.FormEvent<HTMLFormElement>) {
@@ -124,7 +134,11 @@ export default function SpielberichtFormular({ spielId, teilnehmer, initialTore 
     });
   }
 
-  const moeglicheAssists = teilnehmer.filter((t) => t.id !== scorerId);
+  const moeglicheAssists = teilnehmer.filter((t) => {
+    if (t.id === scorerId) return false;
+    if (eigentor || !selectedSpieler) return true;
+    return t.team === selectedSpieler.team;
+  });
 
   return (
     <div className="flex flex-col gap-6">
@@ -275,7 +289,7 @@ export default function SpielberichtFormular({ spielId, teilnehmer, initialTore 
           <input
             type="checkbox"
             checked={eigentor}
-            onChange={(e) => setEigentor(e.target.checked)}
+            onChange={(e) => handleEigentorChange(e.target.checked)}
             className="h-4 w-4 rounded border-gray-600 accent-red-500"
           />
           <span className="text-sm text-gray-300">
