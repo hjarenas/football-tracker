@@ -291,6 +291,26 @@ export default function SpielBearbeitenFormular({
     if (spieler) setEditTorTeam(spieler.team);
   }
 
+  function handleEigentorChange(checked: boolean) {
+    setEigentor(checked);
+    if (!checked && assistId && scorerSpieler) {
+      const assist = spielerMitTeam.find((t) => t.id === assistId);
+      if (assist && assist.team !== scorerSpieler.team) {
+        setAssistId("");
+      }
+    }
+  }
+
+  function handleEditEigentorChange(checked: boolean) {
+    setEditEigentor(checked);
+    if (!checked && editAssistId && editScorerSpieler) {
+      const assist = spielerMitTeam.find((t) => t.id === editAssistId);
+      if (assist && assist.team !== editScorerSpieler.team) {
+        setEditAssistId("");
+      }
+    }
+  }
+
   async function handleTorBearbeitenSpeichern(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setTorFehler(null);
@@ -330,8 +350,19 @@ export default function SpielBearbeitenFormular({
     });
   }
 
-  const moeglicheAssists = spielerMitTeam.filter((t) => t.id !== scorerId);
-  const editMoeglicheAssists = spielerMitTeam.filter((t) => t.id !== editScorerId);
+  const scorerSpieler = spielerMitTeam.find((t) => t.id === scorerId);
+  const moeglicheAssists = spielerMitTeam.filter((t) => {
+    if (t.id === scorerId) return false;
+    if (eigentor || !scorerSpieler) return true;
+    return t.team === scorerSpieler.team;
+  });
+
+  const editScorerSpieler = spielerMitTeam.find((t) => t.id === editScorerId);
+  const editMoeglicheAssists = spielerMitTeam.filter((t) => {
+    if (t.id === editScorerId) return false;
+    if (editEigentor || !editScorerSpieler) return true;
+    return t.team === editScorerSpieler.team;
+  });
 
   return (
     <div className="flex flex-col gap-4">
@@ -685,7 +716,7 @@ export default function SpielBearbeitenFormular({
                               <input
                                 type="checkbox"
                                 checked={editEigentor}
-                                onChange={(e) => setEditEigentor(e.target.checked)}
+                                onChange={(e) => handleEditEigentorChange(e.target.checked)}
                                 className="h-4 w-4 rounded border-gray-600 accent-red-500"
                               />
                               <span className="text-sm text-gray-300">Eigentor</span>
@@ -838,7 +869,7 @@ export default function SpielBearbeitenFormular({
                     <input
                       type="checkbox"
                       checked={eigentor}
-                      onChange={(e) => setEigentor(e.target.checked)}
+                      onChange={(e) => handleEigentorChange(e.target.checked)}
                       className="h-4 w-4 rounded border-gray-600 accent-red-500"
                     />
                     <span className="text-sm text-gray-300">
