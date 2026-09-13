@@ -38,7 +38,15 @@ export default defineConfig({
   projects: [
     {
       name: "chromium",
-      use: { ...devices["Desktop Chrome"] },
+      use: {
+        ...devices["Desktop Chrome"],
+        // Lets sandboxes with no network access to the Playwright CDN point
+        // at a browser binary they already have, instead of the version
+        // this repo's @playwright/test pins. Unset everywhere else.
+        launchOptions: process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH
+          ? { executablePath: process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH }
+          : undefined,
+      },
     },
   ],
   webServer: {
